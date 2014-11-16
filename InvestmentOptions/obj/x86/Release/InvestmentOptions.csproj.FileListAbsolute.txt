@@ -1,0 +1,7 @@
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Release\InvestmentOptions.BankAccountGraph.resources
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Release\InvestmentOptions.Properties.Resources.resources
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Release\InvestmentOptions.csproj.GenerateResource.Cache
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\bin\Release\InvestmentOptions.exe
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\bin\Release\InvestmentOptions.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Release\InvestmentOptions.exe
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Release\InvestmentOptions.pdb
