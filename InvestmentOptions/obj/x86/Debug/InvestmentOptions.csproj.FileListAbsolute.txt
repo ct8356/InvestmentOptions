@@ -5,4 +5,4 @@ C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\Investmen
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Debug\InvestmentOptions.exe
 C:\Users\Chris\Documents\Visual Studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Debug\InvestmentOptions.pdb
 C:\Users\Chris\documents\visual studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Debug\InvestmentOptions.csprojResolveAssemblyReference.cache
-C:\Users\Chris\documents\visual studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Debug\InvestmentOptions.BankAccountGraph.resources
+C:\Users\Chris\documents\visual studio 2010\Projects\InvestmentOptions\InvestmentOptions\obj\x86\Debug\InvestmentOptions.ProjectionForm.resources

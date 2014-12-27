@@ -47,13 +47,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BankAccountGraph.cs">
+    <Compile Include="BankAccount.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="ProjectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="InvestmentOption.cs" />
+    <Compile Include="OptionDictator.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProjectionPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="BankAccountGraph.resx">
-      <DependentUpon>BankAccountGraph.cs</DependentUpon>
+    <EmbeddedResource Include="ProjectionForm.resx">
+      <DependentUpon>ProjectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
