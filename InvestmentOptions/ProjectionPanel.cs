@@ -16,6 +16,7 @@ namespace InvestmentOptions {
         private ChartArea chartArea1;
         private Series series1;
         private Title title1;
+
         public ProjectionPanel() {
             //PANEL STUFF
             Text = "Christiaan Panel";
@@ -38,8 +39,7 @@ namespace InvestmentOptions {
             legend1 = new Legend();
             legend1.Name = "legend1";
             chart1.Legends.Add(legend1);
-            //series1.Legend = "legend1";
-            
+            //series1.Legend = "legend1";   
         }
 
         public void presentInvestmentOption(InvestmentOption option) {
@@ -57,12 +57,11 @@ namespace InvestmentOptions {
             for (int interval = 1; interval < intervals.Count(); interval++) {
                 DataPointCollection points = series1.Points; //create points, because it is easier to watch.
                 points.AddY(projection[interval]); //problem is, this points is null until something is added..
-            }
-            
+            }          
             showDetails(option);
         }
 
-        public void showDetails(InvestmentOption option) {
+        public void showDetails1(InvestmentOption option) {
             //OTHER STUFF
             int i = 0;
             String tab;
@@ -76,6 +75,12 @@ namespace InvestmentOptions {
                 Controls.Add(label);
                 i++;
             }
+        }
+
+        public void showDetails(InvestmentOption option) {
+            option.treeView.Size = new Size(300, 250); //might be better to make it property of panel,
+            //then pass it to option, to have stuff added to it...
+            Controls.Add(option.treeView);
         }
 
     }

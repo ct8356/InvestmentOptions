@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace InvestmentOptions {
 
@@ -21,6 +22,7 @@ namespace InvestmentOptions {
         // but if it gets complicated, put stuff in BankAccount. So leave it there...
         public float[] netWorthProjection; //Floats and ints fine into millions. Be careful when reach billions.
         public float netWorth;
+        public TreeView treeView = new TreeView();
         //INGOINGS
         public float ingoings;
         public float jobIncome = 1500;
@@ -71,6 +73,7 @@ namespace InvestmentOptions {
         public int propertyType; //buyToLive or buyToLet
         //INDICES
         //These perhaps should be stored somewhere else, but for now, just store them here...
+        public float propertyProfit;
         public Dictionary<String, float> indexDictionary = new Dictionary<String, float>();
         //Dictionary so much better than list of your own KeyValuePairs, because can
         //search the dictionary by key, whereas can only search List by numbers!
@@ -78,37 +81,44 @@ namespace InvestmentOptions {
         //SO, not THAT much better, but does mean I don't need all these cumIngoingsI things!
         //Well, actually, would not need that either. Just make them anonymous, by instantiating in fill method.
         //SO, not much better, BUT means don't need to instantiate each one... Tiny bit tidier...
-        public float propertyProfit = 0;
-        public float cumIngoings = 0;
-        public float cumJobIngoings = 0;
-        public float cumPropertyIngoings = 0;
-        public float cumOutgoings = 0;
-        public float cumHouseCosts = 0;
-        public float cumLivingCosts = 0;
-        public float cumMortageRepayments = 0;
+        public Node cumIngoings = new Node() {Name = "cumIngoings"};
+            public Node cumJobIngoings = new Node() {Name = "cumJobIngoings"};
+            public Node cumPropertyIngoings = new Node() { Name = "cumPropertyIngoings" };
+        public Node cumOutgoings = new Node() { Name = "cumOutgoings"};
+            public Node cumHouseCosts = new Node() { Name = "cumHouseCosts" };
+            public Node cumLivingCosts = new Node() { Name = "cumLivingCosts" };
+            public Node cumPropertyCosts = new Node() { Name = "cumPropertyCosts" };
+                public Node cumMortgageInterest = new Node() { Name = "cumMortgageInterest" };
+                public Node cumAgentsFee = new Node() { Name = "cumAgentsFee" };
+                public Node cumWearAndTear = new Node() { Name = "cumWearAndTear" };
+                public Node cumMortageRepayments = new Node() { Name = "cumMortageRepayments" };
+        public Node cumPropertyIncomeTax = new Node() { Name = "cumPropertyIncomeTax" };
+        public Node cumStudentLoanRepayments = new Node() { Name = "cumStudentLoanRepayments" };
+        //interesting alternative to above, might be one class, with a load of nested-classes...
+        //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
 
-        public float cumPropertyCosts = 0;
-        public float cumAgentsFee = 0;
-        public float cumWearAndTear = 0;
+        public void fillTree() {
+            treeView.Nodes.Add(cumIngoings);
+                cumIngoings.Nodes.Add(cumJobIngoings);
+                cumIngoings.Nodes.Add(cumPropertyIngoings);
+            treeView.Nodes.Add(cumOutgoings);
+                cumOutgoings.Nodes.Add(cumHouseCosts);
+                cumOutgoings.Nodes.Add(cumLivingCosts);
+                cumOutgoings.Nodes.Add(cumPropertyCosts);
+                    cumPropertyCosts.Nodes.Add(cumMortgageInterest);
+                    cumPropertyCosts.Nodes.Add(cumAgentsFee);
+                    cumPropertyCosts.Nodes.Add(cumWearAndTear);
+                    cumPropertyCosts.Nodes.Add(cumMortageRepayments);
+            treeView.Nodes.Add(cumPropertyIncomeTax);
+            treeView.Nodes.Add(cumStudentLoanRepayments);
+            labelTree(treeView.Nodes);
+        }
 
-        public float cumMortgageInterest = 0;
-        public float cumStudentLoanRepayments = 0;
-        public float cumPropertyIncomeTax = 0;
-
-        public void fillDictionary() {
-            indexDictionary.Add("cumIngoings", cumIngoings);
-            indexDictionary.Add("cumJobIngoings", cumJobIngoings);
-            indexDictionary.Add("cumPropertyIngoings", cumPropertyIngoings); //after removing income tax...
-            indexDictionary.Add("cumOutgoings", cumOutgoings);
-            indexDictionary.Add("cumHouseCosts", cumHouseCosts);
-            indexDictionary.Add("cumLivingCosts", cumLivingCosts);
-            indexDictionary.Add("cumMortageRepayments", cumMortageRepayments);
-            indexDictionary.Add("cumPropertyCosts", cumPropertyCosts);
-            indexDictionary.Add("cumAgentsFee", cumAgentsFee);
-            indexDictionary.Add("cumMortgageInterest", cumMortgageInterest);
-            indexDictionary.Add("cumWearAndTear", cumWearAndTear);
-            indexDictionary.Add("cumStudentLoanRepayments", cumStudentLoanRepayments);
-            indexDictionary.Add("cumIncomeTax", cumPropertyIncomeTax);
+        public void labelTree(TreeNodeCollection nodes) {
+            foreach (Node node in nodes) {
+                node.Text = node.Name + ": £" + String.Format("{0:n}", node.cumulativeValue);
+                labelTree(node.Nodes);
+            }
         }
 
         public InvestmentOption() {
@@ -202,26 +212,26 @@ namespace InvestmentOptions {
                 bankAccountProjection[interval] = bankAccount.contents;
                 netWorthProjection[interval] = netWorth;
                 //STORE TOTALS:
-                cumPropertyIncomeTax += propertyIncomeTax;
-                cumHouseCosts += houseCosts;
-                cumJobIngoings += jobIngoings;
-                cumIngoings += ingoings;
-                cumOutgoings += outgoings;
-                cumAgentsFee += agentsFee;
-                cumLivingCosts += livingCosts;
-                cumMortageRepayments += mortgageRepayment;
-                cumPropertyCosts += propertyCosts;
-                cumPropertyIngoings += tenantsRent - propertyIncomeTax;
-                cumStudentLoanRepayments += studentLoanPayment;
-                cumMortgageInterest += mortgageInterest;
-                cumWearAndTear += wearAndTear;
+                cumIngoings.cumulativeValue += ingoings;
+                    cumJobIngoings.cumulativeValue += jobIngoings;
+                    cumPropertyIngoings.cumulativeValue += tenantsRent - propertyIncomeTax;
+                    cumMortgageInterest.cumulativeValue += mortgageInterest;
+                    cumWearAndTear.cumulativeValue += wearAndTear;
+                cumOutgoings.cumulativeValue += outgoings;
+                    cumHouseCosts.cumulativeValue += houseCosts;
+                    cumAgentsFee.cumulativeValue += agentsFee;
+                    cumLivingCosts.cumulativeValue += livingCosts;
+                    cumMortageRepayments.cumulativeValue += mortgageRepayment;
+                    cumPropertyCosts.cumulativeValue += propertyCosts;
+                cumPropertyIncomeTax.cumulativeValue += propertyIncomeTax;
+                cumStudentLoanRepayments.cumulativeValue += studentLoanPayment;
                 //REPEATS
                 //writeLine("mP", mortgagePayment);
                 //writeLine("In", ingoings);
                 //writeLine("", jobIngoings);
                 //writeLine("", tenantsRent);
             }
-            fillDictionary();
+            fillTree();
         }
 
         public void writeLine(String name, float value) {

@@ -6,10 +6,12 @@ using System.Windows.Forms;
 
 namespace InvestmentOptions {
 
-    class Node : TreeNode {
+    public class Node : TreeNode {
+        //later, if decide treeNode is too heavyWeight, to have loads of,
+        // just modify this class, to make it more lightWeight...
 
-        float monthlyValue;
-        float cumulativeValue;
+        public float monthlyValue;
+        public float cumulativeValue = 0;
         //List<Node> children; //Not needed now...
 
         public void addChild() {
@@ -18,6 +20,10 @@ namespace InvestmentOptions {
 
         public void removeChild() {
             //Not needed now
+        }
+
+        public void traverseDescendants() {
+
         }
     }
 }
