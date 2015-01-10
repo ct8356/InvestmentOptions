@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BankAccount.cs" />
+    <Compile Include="ControlPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Node.cs" />
     <Compile Include="ProjectionForm.cs">
       <SubType>Form</SubType>

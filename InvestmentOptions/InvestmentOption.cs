@@ -10,8 +10,8 @@ namespace InvestmentOptions {
         //This is the class to change, if you want to change the investment option!
         //Well actually, eventually want to do that from option dictator...
         //But if want to make it more sophisticated, start here (and inside its properties)...
-        public String name;
-        public int years = 25;
+        public String Name;
+        public int years = 10;
         public int intervals; //(interval is one month)...
         public float[] bankAccountProjection;
         public BankAccount bankAccount = new BankAccount();
@@ -29,11 +29,11 @@ namespace InvestmentOptions {
         public float jobIngoings;
         public float bankInterest;
         public float bankInterestRate = 0.000f; //0, since bIR only covers inflation, not accounted for here..
-        public float tenantsRent = 700; //Sure to always be fairly HIGH amount, coz would buy in SouthWest...
+        public float tenantsRent = 2*330; //Sure to always be fairly HIGH amount, coz would buy in SouthWest...
         //OUTGOINGS
         public float outgoings;
         public float houseCosts;
-        public float rent = 350; //Could actually be less. But nah. I should have bit of luxury...
+        public float rent = 330; //Could actually be less. But nah. I should have bit of luxury...
         public float houseBills = 45;
         public float livingCosts;
         public float charity = 45;
@@ -92,8 +92,10 @@ namespace InvestmentOptions {
                 public Node cumAgentsFee = new Node() { Name = "cumAgentsFee" };
                 public Node cumWearAndTear = new Node() { Name = "cumWearAndTear" };
                 public Node cumMortageRepayments = new Node() { Name = "cumMortageRepayments" };
+                public Node cumAccountantsFee = new Node() { Name = "cumAccountantsFee" };
         public Node cumPropertyIncomeTax = new Node() { Name = "cumPropertyIncomeTax" };
         public Node cumStudentLoanRepayments = new Node() { Name = "cumStudentLoanRepayments" };
+        public Node mortgagePaymentNode = new Node() { Name = "mortgagePayment" };
         //interesting alternative to above, might be one class, with a load of nested-classes...
         //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
 
@@ -109,8 +111,10 @@ namespace InvestmentOptions {
                     cumPropertyCosts.Nodes.Add(cumAgentsFee);
                     cumPropertyCosts.Nodes.Add(cumWearAndTear);
                     cumPropertyCosts.Nodes.Add(cumMortageRepayments);
+                    cumPropertyCosts.Nodes.Add(cumAccountantsFee);
             treeView.Nodes.Add(cumPropertyIncomeTax);
             treeView.Nodes.Add(cumStudentLoanRepayments);
+            treeView.Nodes.Add(mortgagePaymentNode);
             labelTree(treeView.Nodes);
         }
 
@@ -122,6 +126,10 @@ namespace InvestmentOptions {
         }
 
         public InvestmentOption() {
+            //do nothing
+        }
+
+        public void initialSetup() {
             //Initial setup:
             intervals = years * 12;
             moneyBorrowed = housePrice - deposit;
@@ -140,8 +148,8 @@ namespace InvestmentOptions {
             calculatePropertyCosts();
             propertyProfit = tenantsRent - (propertyCosts - mortgageRepayment); 
             //Note, not quite right, if exceeds rent a room scheme limit!
-            if (propertyProfit < 0) propertyProfit = 0;
-            propertyIncomeTax = propertyProfit * 0.20f; 
+            propertyIncomeTax = propertyProfit * 0.20f;
+            if (propertyIncomeTax < 0) propertyIncomeTax = 0;
             switch (propertyType) {
                 case 0: //Buy to live in
                     if (tenantsRent <= 4250) propertyIncomeTax = 0; //Rent a room scheme...
@@ -199,6 +207,7 @@ namespace InvestmentOptions {
         }
 
         public void makeProjection() {
+            initialSetup();
             bankAccountProjection = new float[intervals];
             netWorthProjection = new float[intervals];
             for (int interval = 0; interval < intervals; interval++) {
@@ -215,14 +224,15 @@ namespace InvestmentOptions {
                 cumIngoings.cumulativeValue += ingoings;
                     cumJobIngoings.cumulativeValue += jobIngoings;
                     cumPropertyIngoings.cumulativeValue += tenantsRent - propertyIncomeTax;
-                    cumMortgageInterest.cumulativeValue += mortgageInterest;
-                    cumWearAndTear.cumulativeValue += wearAndTear;
                 cumOutgoings.cumulativeValue += outgoings;
-                    cumHouseCosts.cumulativeValue += houseCosts;
-                    cumAgentsFee.cumulativeValue += agentsFee;
-                    cumLivingCosts.cumulativeValue += livingCosts;
-                    cumMortageRepayments.cumulativeValue += mortgageRepayment;
+                    cumHouseCosts.cumulativeValue += houseCosts; 
+                    cumLivingCosts.cumulativeValue += livingCosts; 
                     cumPropertyCosts.cumulativeValue += propertyCosts;
+                        cumMortageRepayments.cumulativeValue += mortgageRepayment;
+                        cumMortgageInterest.cumulativeValue += mortgageInterest;
+                        cumWearAndTear.cumulativeValue += wearAndTear;
+                        cumAgentsFee.cumulativeValue += agentsFee;
+                        cumAccountantsFee.cumulativeValue += accountantsFee;
                 cumPropertyIncomeTax.cumulativeValue += propertyIncomeTax;
                 cumStudentLoanRepayments.cumulativeValue += studentLoanPayment;
                 //REPEATS
@@ -231,7 +241,13 @@ namespace InvestmentOptions {
                 //writeLine("", jobIngoings);
                 //writeLine("", tenantsRent);
             }
+            mortgagePaymentNode.cumulativeValue = mortgagePayment;
             fillTree();
+        }
+
+        public override String ToString() {
+            String name = Name;
+            return name;
         }
 
         public void writeLine(String name, float value) {

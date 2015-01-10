@@ -10,6 +10,7 @@ namespace InvestmentOptions {
 
         ProjectionForm form = new ProjectionForm(); 
         //Can only be ONE form, because only 1 form can run at a time...
+        List<InvestmentOption> options = new List<InvestmentOption>();
 
         public OptionDictator() {
             presentOptionCombination();
@@ -25,33 +26,49 @@ namespace InvestmentOptions {
             flatNottingham.mortgagePayment = 100;
             //therefore, it should have its own real world properties, like bankAccountContents, and years... 
             //(model scale).
-            form.presentInvestmentOptions(flatNottingham, flatNottingham);
+            //form.presentInvestmentOptions();
         }
 
         public void presentOptionCombination() {
             InvestmentOption interestOnlyMortgage = new InvestmentOption();
-            interestOnlyMortgage.name = "interestOnlyMortgage";
+            interestOnlyMortgage.Name = "interestOnlyMortgage";
             interestOnlyMortgage.mortgageType = 1;
             interestOnlyMortgage.propertyType = 1;
+            options.Add(interestOnlyMortgage);
             //form.presentInvestmentOption(interestOnlyMortgage);
 
             InvestmentOption repaymentMortgage = new InvestmentOption();
-            repaymentMortgage.name = "repaymentMortgage";
+            repaymentMortgage.Name = "repaymentMortgage";
             repaymentMortgage.mortgageType = 0;
             repaymentMortgage.propertyType = 1;
+            options.Add(repaymentMortgage);
            
             InvestmentOption buyToLiveMortgage = new InvestmentOption();
-            buyToLiveMortgage.name = "buyToLiveMortgage";
+            buyToLiveMortgage.Name = "buyToLiveMortgage";
             buyToLiveMortgage.mortgageType = 0;
-            interestOnlyMortgage.propertyType = 0;
-            buyToLiveMortgage.tenantsRent = 350;
+            buyToLiveMortgage.propertyType = 0;
+            buyToLiveMortgage.tenantsRent = buyToLiveMortgage.tenantsRent/2;
             buyToLiveMortgage.agentsFee = buyToLiveMortgage.agentsFee/2;
             buyToLiveMortgage.wearAndTear = buyToLiveMortgage.wearAndTear;
             buyToLiveMortgage.accountantsFee = 0;
             buyToLiveMortgage.rent = 0;
-            //graph.presentInvestmentOption(buyToLiveMortgage);
+            options.Add(buyToLiveMortgage);
 
-            form.presentInvestmentOptions(repaymentMortgage, buyToLiveMortgage);
+            InvestmentOption threeBedBTLM = new InvestmentOption();
+            threeBedBTLM.Name = "threeBedBTLM";
+            threeBedBTLM.mortgageType = 0;
+            threeBedBTLM.propertyType = 0;
+            threeBedBTLM.tenantsRent = threeBedBTLM.tenantsRent;
+            threeBedBTLM.agentsFee = threeBedBTLM.agentsFee;
+            threeBedBTLM.wearAndTear = threeBedBTLM.wearAndTear;
+            threeBedBTLM.accountantsFee = 0;
+            threeBedBTLM.rent = 0;
+            threeBedBTLM.housePrice = 140000;
+            options.Add(threeBedBTLM);
+
+            //form.presentInvestmentOptions(repaymentMortgage, buyToLiveMortgage);
+            //form.presentInvestmentOptions(buyToLiveMortgage, threeBedBTLM);
+            form.presentInvestmentOptions(options);
             Application.Run(form); 
             //seems like it does not continue with the rest of code until this is closed..
             //try putting it at the end...

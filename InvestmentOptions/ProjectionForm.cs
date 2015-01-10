@@ -12,18 +12,20 @@ namespace InvestmentOptions {
 
     public class ProjectionForm : Form {
         private IContainer components = null;
-        private TableLayoutPanel mainPanel = new TableLayoutPanel();
+        private ControlPanel controlPanel = new ControlPanel();
+        private TableLayoutPanel tablePanel = new TableLayoutPanel();
+        private float controlPanelWidth = 15;
 
         public ProjectionForm() {
             ClientSize = new Size(700, 600);
+            WindowState = FormWindowState.Maximized;
             Text = "Christiaan Form";
             //Screw it, lets just use the tableLayoutPanel...
-            mainPanel.Dock = DockStyle.Fill;
-            mainPanel.RowCount = 0;
-            mainPanel.ColumnCount = 2; //Not needed apparently, but whatever...
-            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            mainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F)); //YES, two of these are needed!
-            Controls.Add(mainPanel);
+            tablePanel.Dock = DockStyle.Fill;
+            tablePanel.RowCount = 0;
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, controlPanelWidth));
+            tablePanel.Controls.Add(controlPanel, 0, 0); //in first column
+            Controls.Add(tablePanel);
         }
         
         /// <summary>
@@ -37,23 +39,19 @@ namespace InvestmentOptions {
             base.Dispose(disposing);
         }
 
-        public void presentInvestmentOptions(InvestmentOption option1, InvestmentOption option2) {
-            ProjectionPanel panel1 = new ProjectionPanel();
-            setUpPanel(panel1, 0); //dont think it matters when you do this...
-            panel1.Dock = DockStyle.Fill;
-            //panel1.Anchor = AnchorStyles.Left;
-            //panel1.Anchor = AnchorStyles.Top;
-            //panel1.Anchor = AnchorStyles.Right; //Anchors are weird. I dont really get them.     
-            panel1.presentInvestmentOption(option1);
-
-            ProjectionPanel panel2 = new ProjectionPanel();
-            setUpPanel(panel2, 1);
-            panel2.Dock = DockStyle.Fill;
-            panel2.presentInvestmentOption(option2);         
+        public void presentInvestmentOptions(List<InvestmentOption> options) {
+            controlPanel.listBox.Items.AddRange(options.ToArray());
+            for (int optionNo = 0; optionNo < options.Count; optionNo++) {
+                ProjectionPanel panel = new ProjectionPanel();
+                addProjectionPanel(panel, optionNo, options.Count);
+                panel.Dock = DockStyle.Fill;
+                panel.presentInvestmentOption(options[optionNo]);
+            }
         }
 
-        public void setUpPanel(ProjectionPanel panel, int column) {
-            mainPanel.Controls.Add(panel, column, 0);
+        public void addProjectionPanel(ProjectionPanel panel, int column, int count) {
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, (100f-controlPanelWidth)/(count)));
+            tablePanel.Controls.Add(panel, 1+column, 0);
         }
 
     }
