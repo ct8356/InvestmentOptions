@@ -6,7 +6,6 @@ using System.Text;
 namespace InvestmentOptions {
 
     public class BankAccount {
-        public float contents = 17000;
-
+        public float contents;
     }
 }

@@ -8,14 +8,16 @@ namespace InvestmentOptions {
 
     public class ControlPanel : FlowLayoutPanel {
 
-        public CheckedListBox listBox = new CheckedListBox();
+        public MyCheckedListBox listBox;
+        public Button refreshButton = new Button();
 
-        public ControlPanel() {
+        public ControlPanel(ProjectionForm form) {
             //PANEL STUFF
             Text = "Christiaan Panel";
             FlowDirection = FlowDirection.TopDown;
-            
+            listBox = new MyCheckedListBox(form);
             Controls.Add(listBox);
+            Controls.Add(refreshButton);
         }
 
     }

@@ -8,7 +8,7 @@ namespace InvestmentOptions {
 
     class OptionDictator {
 
-        ProjectionForm form = new ProjectionForm(); 
+        ProjectionForm form = new ProjectionForm();
         //Can only be ONE form, because only 1 form can run at a time...
         List<InvestmentOption> options = new List<InvestmentOption>();
 
@@ -33,37 +33,42 @@ namespace InvestmentOptions {
             InvestmentOption interestOnlyMortgage = new InvestmentOption();
             interestOnlyMortgage.Name = "interestOnlyMortgage";
             interestOnlyMortgage.mortgageType = 1;
-            interestOnlyMortgage.propertyType = 1;
+            interestOnlyMortgage.buyType = 1;
             options.Add(interestOnlyMortgage);
             //form.presentInvestmentOption(interestOnlyMortgage);
+
+            InvestmentOption interestOnlyBTLM = new InvestmentOption();
+            interestOnlyBTLM.Name = "interestOnlyBTLM";
+            interestOnlyBTLM.mortgageType = 1;
+            interestOnlyBTLM.buyType = 0;
+            interestOnlyBTLM.tenantCount = 1;
+            interestOnlyBTLM.rent = 0;
+            options.Add(interestOnlyBTLM);
 
             InvestmentOption repaymentMortgage = new InvestmentOption();
             repaymentMortgage.Name = "repaymentMortgage";
             repaymentMortgage.mortgageType = 0;
-            repaymentMortgage.propertyType = 1;
+            repaymentMortgage.buyType = 1;
             options.Add(repaymentMortgage);
            
             InvestmentOption buyToLiveMortgage = new InvestmentOption();
             buyToLiveMortgage.Name = "buyToLiveMortgage";
             buyToLiveMortgage.mortgageType = 0;
-            buyToLiveMortgage.propertyType = 0;
-            buyToLiveMortgage.tenantsRent = buyToLiveMortgage.tenantsRent/2;
-            buyToLiveMortgage.agentsFee = buyToLiveMortgage.agentsFee/2;
-            buyToLiveMortgage.wearAndTear = buyToLiveMortgage.wearAndTear;
-            buyToLiveMortgage.accountantsFee = 0;
+            buyToLiveMortgage.buyType = 0;
+            buyToLiveMortgage.tenantCount = 1;
             buyToLiveMortgage.rent = 0;
             options.Add(buyToLiveMortgage);
 
             InvestmentOption threeBedBTLM = new InvestmentOption();
             threeBedBTLM.Name = "threeBedBTLM";
             threeBedBTLM.mortgageType = 0;
-            threeBedBTLM.propertyType = 0;
+            threeBedBTLM.buyType = 0;
             threeBedBTLM.tenantsRent = threeBedBTLM.tenantsRent;
             threeBedBTLM.agentsFee = threeBedBTLM.agentsFee;
             threeBedBTLM.wearAndTear = threeBedBTLM.wearAndTear;
             threeBedBTLM.accountantsFee = 0;
             threeBedBTLM.rent = 0;
-            threeBedBTLM.housePrice = 140000;
+            threeBedBTLM.housePrice = 125000;
             options.Add(threeBedBTLM);
 
             //form.presentInvestmentOptions(repaymentMortgage, buyToLiveMortgage);

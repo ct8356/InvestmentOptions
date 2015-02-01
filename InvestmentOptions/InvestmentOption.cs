@@ -13,23 +13,27 @@ namespace InvestmentOptions {
         public String Name;
         public int years = 10;
         public int intervals; //(interval is one month)...
-        public float[] bankAccountProjection;
         public BankAccount bankAccount = new BankAccount();
         //Note, I would say, don't split things into new classes, unless you really have to.
         //InvestmentOptions is PROBABLY as small as you need to go, for your purposes...
         //Do NOT want bankAccount to have outgoings inside it. That is a characteristic of 
         //investment options... I think...
         // but if it gets complicated, put stuff in BankAccount. So leave it there...
-        public float[] netWorthProjection; //Floats and ints fine into millions. Be careful when reach billions.
+        //Floats and ints fine into millions. Be careful when reach billions.
         public float netWorth;
         public TreeView treeView = new TreeView();
+        public List<Node> nodeList = new List<Node>();
+
         //INGOINGS
         public float ingoings;
         public float jobIncome = 1500;
         public float jobIngoings;
         public float bankInterest;
         public float bankInterestRate = 0.000f; //0, since bIR only covers inflation, not accounted for here..
-        public float tenantsRent = 2*330; //Sure to always be fairly HIGH amount, coz would buy in SouthWest...
+        public float tenantCount;
+        public float oneTenantsRent = 330;
+        public float tenantsRent; //Sure to always be fairly HIGH amount, coz would buy in SouthWest...
+        public float taxableTenantsRent;
         //OUTGOINGS
         public float outgoings;
         public float houseCosts;
@@ -41,7 +45,7 @@ namespace InvestmentOptions {
         public float councilTax = 100;
         public float studentLoanPayment;
         public float mortgagePayment = 0;
-        public float propertyCosts;
+        public float propertyOutgoings;
         //LIVING COSTS
         public float phoneBill = 10;
         public float food = 140;
@@ -62,15 +66,21 @@ namespace InvestmentOptions {
         //INCOME TAX
         public float incomeTaxRate = 0.20f;
         //PROPERTY MAINTENANCE
-        public float agentsFee = 100; //Not really worth it! That's 10 hours a month!
+        //15%. 10% for finding tenant, 5% for all else...
+        //BUT hey, 10% is fine, since cost of not finding tenant for one month is 8%!
+        //OR could find a nice student/smart kid, and employ him to do it! Pay him very well!
+        public float agentsFee; //Not really worth it! That's 8-10 hours a month! That is easy. (or is it?)
+        //No, not easy, BUT won't take that much time in reality (or will it? per tenant?).
+        //Unlikely, but what can you do. I am really constrained! Sure, if want to, can manage one room self,
+        //and see how it goes...
         //Could do self in less, easy!
         //Or pay Dad to do it!
-        public float wearAndTear = 90;
-        public float buildingsInsurance = 12;
-        public float accountantsFee = 9;
+        public float wearAndTear;
+        public float buildingsInsurance;
+        public float accountantsFee;
         //NOTE: If wanted to get rid of all the floats above, could turn some of them into methods...
         //SWITCHES
-        public int propertyType; //buyToLive or buyToLet
+        public int buyType; //buyToLive or buyToLet
         //INDICES
         //These perhaps should be stored somewhere else, but for now, just store them here...
         public float propertyProfit;
@@ -85,9 +95,9 @@ namespace InvestmentOptions {
             public Node cumJobIngoings = new Node() {Name = "cumJobIngoings"};
             public Node cumPropertyIngoings = new Node() { Name = "cumPropertyIngoings" };
         public Node cumOutgoings = new Node() { Name = "cumOutgoings"};
-            public Node cumHouseCosts = new Node() { Name = "cumHouseCosts" };
-            public Node cumLivingCosts = new Node() { Name = "cumLivingCosts" };
-            public Node cumPropertyCosts = new Node() { Name = "cumPropertyCosts" };
+            public Node cumShelterOutgoings = new Node() { Name = "cumShelterOutgoings" };
+            public Node cumLivingOutgoings = new Node() { Name = "cumLivingOutgoings" };
+            public Node cumPropertyOutgoings = new Node() { Name = "cumPropertyOutgoings" };
                 public Node cumMortgageInterest = new Node() { Name = "cumMortgageInterest" };
                 public Node cumAgentsFee = new Node() { Name = "cumAgentsFee" };
                 public Node cumWearAndTear = new Node() { Name = "cumWearAndTear" };
@@ -96,6 +106,12 @@ namespace InvestmentOptions {
         public Node cumPropertyIncomeTax = new Node() { Name = "cumPropertyIncomeTax" };
         public Node cumStudentLoanRepayments = new Node() { Name = "cumStudentLoanRepayments" };
         public Node mortgagePaymentNode = new Node() { Name = "mortgagePayment" };
+        //OTHER NODES
+        public Node bankAccountN; 
+        public Node netWorthN; 
+        public Node propertyProfitN;
+        public Node tenantsRentN;
+        public Node taxableTenantsRentN;
         //interesting alternative to above, might be one class, with a load of nested-classes...
         //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
 
@@ -104,18 +120,18 @@ namespace InvestmentOptions {
                 cumIngoings.Nodes.Add(cumJobIngoings);
                 cumIngoings.Nodes.Add(cumPropertyIngoings);
             treeView.Nodes.Add(cumOutgoings);
-                cumOutgoings.Nodes.Add(cumHouseCosts);
-                cumOutgoings.Nodes.Add(cumLivingCosts);
-                cumOutgoings.Nodes.Add(cumPropertyCosts);
-                    cumPropertyCosts.Nodes.Add(cumMortgageInterest);
-                    cumPropertyCosts.Nodes.Add(cumAgentsFee);
-                    cumPropertyCosts.Nodes.Add(cumWearAndTear);
-                    cumPropertyCosts.Nodes.Add(cumMortageRepayments);
-                    cumPropertyCosts.Nodes.Add(cumAccountantsFee);
+                cumOutgoings.Nodes.Add(cumShelterOutgoings);
+                cumOutgoings.Nodes.Add(cumLivingOutgoings);
+                cumOutgoings.Nodes.Add(cumPropertyOutgoings);
+                    cumPropertyOutgoings.Nodes.Add(cumMortgageInterest);
+                    cumPropertyOutgoings.Nodes.Add(cumAgentsFee);
+                    cumPropertyOutgoings.Nodes.Add(cumWearAndTear);
+                    cumPropertyOutgoings.Nodes.Add(cumMortageRepayments);
+                    cumPropertyOutgoings.Nodes.Add(cumAccountantsFee);
             treeView.Nodes.Add(cumPropertyIncomeTax);
             treeView.Nodes.Add(cumStudentLoanRepayments);
             treeView.Nodes.Add(mortgagePaymentNode);
-            labelTree(treeView.Nodes);
+            //labelTree(treeView.Nodes); // ahah, NOW, fill tree mean Initialise tree!
         }
 
         public void labelTree(TreeNodeCollection nodes) {
@@ -125,38 +141,94 @@ namespace InvestmentOptions {
             }
         }
 
+        public void resetTree(TreeNodeCollection nodes) {
+            foreach (Node node in nodes) {
+                node.cumulativeValue = 0;
+                resetTree(node.Nodes);
+            }
+        }
+
         public InvestmentOption() {
-            //do nothing
+            fillTree(); //unfortunately, fillTree has to come at end of make projection.
+            //but there are initialisation things in fill tree. Need to separate them. 
+            //create an intialiseTree method...
+            //Or a bind to tree method...
+            //OR use the tree itself as main variables.
+            //OR bind the tree to these variables...
+            //OR any of above, just try one... then will see strengths and weaknesses.
+            //FORTUNATELY, labelTree can come at end of make projection!
+            createNodeList();
         }
 
         public void initialSetup() {
             //Initial setup:
             intervals = years * 12;
             moneyBorrowed = housePrice - deposit;
-            moneyOwed = moneyBorrowed;
-            netWorth = bankAccount.contents;
+            moneyOwed = moneyBorrowed;         
             calculateStudentLoanPayment();
             jobIngoings = jobIncome - studentLoanPayment;
+            bankAccount.contents = 17000;
+            netWorth = bankAccount.contents;
+            tenantCount = 2;
+            updateMultiples();
         }
 
-        public void calculatePropertyCosts() {
-            propertyCosts = agentsFee + wearAndTear + buildingsInsurance + accountantsFee +
+        public void autoInvest() {
+            //check
+            if (bankAccount.contents > deposit) {
+                //invest
+                moneyBorrowed += housePrice - deposit; // not that important.
+                moneyOwed += housePrice - deposit;
+                bankAccount.contents -= deposit;
+                //Benefits
+                tenantCount += 2;
+                updateMultiples();
+            } //something you forgetting to update. what is it? YES the extra features that make you money!
+        }
+
+        public void createNodeList() {
+            bankAccountN = new Node(intervals) { Name = "bankAccount" };
+            netWorthN = new Node(intervals) { Name = "netWorth" };
+            propertyProfitN = new Node(intervals) { Name = "propertyProfit" };
+            tenantsRentN = new Node(intervals) { Name = "tenantsRent" };
+            taxableTenantsRentN = new Node(intervals) { Name = "taxableTenantsRent" };
+            nodeList.Add(bankAccountN);
+            nodeList.Add(netWorthN);
+            nodeList.Add(propertyProfitN);
+            nodeList.Add(tenantsRentN);
+            nodeList.Add(taxableTenantsRentN);
+        }
+
+        public void updateMultiples() {
+            tenantsRent = tenantCount * oneTenantsRent;
+            agentsFee = tenantsRent * 0.15f;
+            wearAndTear = (tenantCount)/2 * 90;
+            buildingsInsurance = (tenantCount)/2 * 12;
+            accountantsFee = (tenantCount)/2 * 9;
+        }
+
+        public void calculatePropertyOutgoings() {
+            propertyOutgoings = agentsFee + wearAndTear + buildingsInsurance + accountantsFee +
                 mortgageInterest + mortgageRepayment;
         }
 
         public void calculatePropertyIncomeTax() {
-            calculatePropertyCosts();
-            propertyProfit = tenantsRent - (propertyCosts - mortgageRepayment); 
             //Note, not quite right, if exceeds rent a room scheme limit!
-            propertyIncomeTax = propertyProfit * 0.20f;
-            if (propertyIncomeTax < 0) propertyIncomeTax = 0;
-            switch (propertyType) {
+            taxableTenantsRent = tenantsRent;
+            switch (buyType) {
                 case 0: //Buy to live in
-                    if (tenantsRent <= 4250) propertyIncomeTax = 0; //Rent a room scheme...
+                    taxableTenantsRent = tenantsRent - 4250; //Rent a room scheme...
+                    //calculated here, because if use it, CANNOT claim back tax on your letting expenses!
+                    //As gen rule, if expenses are LESS than £4250, then rent room scheme is better for you.
+                    if (taxableTenantsRent < 0) taxableTenantsRent = 0;
                     break;
                 case 1: //Buy to let
                     break;
             }
+            calculatePropertyOutgoings();
+            propertyProfit = taxableTenantsRent - (propertyOutgoings - mortgageRepayment);
+            propertyIncomeTax = propertyProfit * 0.20f;
+            if (propertyIncomeTax < 0) propertyIncomeTax = 0;
         }
 
         public void calculateIngoings() {
@@ -175,10 +247,10 @@ namespace InvestmentOptions {
                     //mortgagePayment = 1100;
                     //Apparently, can use this equation:
                     //P = L*c*[(1 + c)^n]/[(1 + c)^n - 1]
-                    mortgageInterest = moneyOwed * mortgageInterestRate; 
+                    mortgageInterest = moneyOwed * mortgageInterestRate;
                     //this done after or before money Owed and mortgage repayment calculated?
                     //Ahah, if this calc is done first, then all works out easy!
-                    mortgageRepayment = mortgagePayment -  mortgageInterest; 
+                    mortgageRepayment = mortgagePayment -  mortgageInterest;
                     //How is this decided? with some kind of simultaneous eq'n... or numerical method?
                     //note, if simultaneous eq'ns used, could just find the final one on web!
                     //as long as average comes out at £285, its ok).
@@ -199,7 +271,7 @@ namespace InvestmentOptions {
                 randomEventsAndServices + charity;
             calculatePropertyIncomeTax();
             houseCosts = rent + houseBills + councilTax;
-            outgoings = houseCosts + livingCosts + propertyCosts;
+            outgoings = houseCosts + livingCosts + propertyOutgoings;
         }
 
         public void calculateStudentLoanPayment() {
@@ -207,9 +279,10 @@ namespace InvestmentOptions {
         }
 
         public void makeProjection() {
-            initialSetup();
-            bankAccountProjection = new float[intervals];
-            netWorthProjection = new float[intervals];
+            initialSetup(); //makeProjection is runningMethod, not intialisingMethod, so this can't come here.
+            //actually, it can... only CERTAIN initialisation steps that CANNOT be repeated...
+            resetTree(treeView.Nodes);
+            
             for (int interval = 0; interval < intervals; interval++) {
                 //calculations:
                 calculateMortgagePayments(interval);
@@ -218,16 +291,19 @@ namespace InvestmentOptions {
                 bankAccount.contents = bankAccount.contents + ingoings - outgoings;
                 netWorth = netWorth + ingoings - outgoings + mortgageRepayment;
                 //STORE IN ARRAYS:
-                bankAccountProjection[interval] = bankAccount.contents;
-                netWorthProjection[interval] = netWorth;
+                bankAccountN.projection[interval] = bankAccount.contents;
+                netWorthN.projection[interval] = netWorth;
+                propertyProfitN.projection[interval] = propertyProfit;
+                tenantsRentN.projection[interval] = tenantsRent;
+                taxableTenantsRentN.projection[interval] = taxableTenantsRent;
                 //STORE TOTALS:
                 cumIngoings.cumulativeValue += ingoings;
                     cumJobIngoings.cumulativeValue += jobIngoings;
                     cumPropertyIngoings.cumulativeValue += tenantsRent - propertyIncomeTax;
                 cumOutgoings.cumulativeValue += outgoings;
-                    cumHouseCosts.cumulativeValue += houseCosts; 
-                    cumLivingCosts.cumulativeValue += livingCosts; 
-                    cumPropertyCosts.cumulativeValue += propertyCosts;
+                    cumShelterOutgoings.cumulativeValue += houseCosts; 
+                    cumLivingOutgoings.cumulativeValue += livingCosts; 
+                    cumPropertyOutgoings.cumulativeValue += propertyOutgoings;
                         cumMortageRepayments.cumulativeValue += mortgageRepayment;
                         cumMortgageInterest.cumulativeValue += mortgageInterest;
                         cumWearAndTear.cumulativeValue += wearAndTear;
@@ -235,6 +311,7 @@ namespace InvestmentOptions {
                         cumAccountantsFee.cumulativeValue += accountantsFee;
                 cumPropertyIncomeTax.cumulativeValue += propertyIncomeTax;
                 cumStudentLoanRepayments.cumulativeValue += studentLoanPayment;
+                if (mortgageType == 1) autoInvest();
                 //REPEATS
                 //writeLine("mP", mortgagePayment);
                 //writeLine("In", ingoings);
@@ -242,7 +319,7 @@ namespace InvestmentOptions {
                 //writeLine("", tenantsRent);
             }
             mortgagePaymentNode.cumulativeValue = mortgagePayment;
-            fillTree();
+            labelTree(treeView.Nodes);
         }
 
         public override String ToString() {
