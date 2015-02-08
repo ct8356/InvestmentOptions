@@ -3,27 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.ComponentModel; //yeah, because this is now the model for a component! A viewModel!
+using System.Threading;
 
 namespace InvestmentOptions {
 
-    public class InvestmentOption {
+    public class InvestmentOption : INotifyPropertyChanged {
+        //NEED TO SHRINK THIS FILE!
+        // The class has to be initialized from the UI thread
+        public ProjectionPanel projectionPanel;
+        public SynchronizationContext context = SynchronizationContext.Current;
+        public event PropertyChangedEventHandler PropertyChanged;
         //This is the class to change, if you want to change the investment option!
         //Well actually, eventually want to do that from option dictator...
         //But if want to make it more sophisticated, start here (and inside its properties)...
         public String Name;
         public int years = 10;
         public int intervals; //(interval is one month)...
-        public BankAccount bankAccount = new BankAccount();
         //Note, I would say, don't split things into new classes, unless you really have to.
         //InvestmentOptions is PROBABLY as small as you need to go, for your purposes...
         //Do NOT want bankAccount to have outgoings inside it. That is a characteristic of 
         //investment options... I think...
         // but if it gets complicated, put stuff in BankAccount. So leave it there...
         //Floats and ints fine into millions. Be careful when reach billions.
+        public float bankAccountContents;
         public float netWorth;
         public TreeView treeView = new TreeView();
         public List<Node> nodeList = new List<Node>();
-
+        //NOTE, since will need to reset all the below,
+        //and since that is pain in bum, better to put them all in a list... maybe...
         //INGOINGS
         public float ingoings;
         public float jobIncome = 1500;
@@ -62,7 +70,6 @@ namespace InvestmentOptions {
             //0.00408f; //monthly interest rate (number works well for 5% annual).
         //try 487 for 6% annual.
         public float mortgageInterest;
-        public int mortgageType;
         //INCOME TAX
         public float incomeTaxRate = 0.20f;
         //PROPERTY MAINTENANCE
@@ -80,7 +87,26 @@ namespace InvestmentOptions {
         public float accountantsFee;
         //NOTE: If wanted to get rid of all the floats above, could turn some of them into methods...
         //SWITCHES
-        public int buyType; //buyToLive or buyToLet
+        public enum MortgageType { repayment, interestOnly };
+        public MortgageType mortgageType;
+        public enum BuyType { toLiveIn, toLet }; //buyToLive or buyToLet
+        public BuyType buyType;
+        private bool _rentARoomScheme = false;
+        public bool rentARoomScheme {
+            get {
+                return _rentARoomScheme;
+            } 
+            set {
+                _rentARoomScheme = value;
+                //if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs("RentARoomScheme"));
+                //    PropertyChangedEventArgs pcea = new PropertyChangedEventArgs("myValue");
+                //    SendOrPostCallback sopc = new SendOrPostCallback(o => PropertyChanged(this, pcea));
+                //    context.Send(sopc, null);
+                projectionPanel.presentInvestmentOption(this);// use form or panel, to try and just update the panel?
+                //}
+            }
+        }
         //INDICES
         //These perhaps should be stored somewhere else, but for now, just store them here...
         public float propertyProfit;
@@ -107,15 +133,31 @@ namespace InvestmentOptions {
         public Node cumStudentLoanRepayments = new Node() { Name = "cumStudentLoanRepayments" };
         public Node mortgagePaymentNode = new Node() { Name = "mortgagePayment" };
         //OTHER NODES
-        public Node bankAccountN; 
-        public Node netWorthN; 
+        public Node bankAccountN;
+        public Node netWorthN;
         public Node propertyProfitN;
         public Node tenantsRentN;
         public Node taxableTenantsRentN;
+        public Node propertyCostsN;
         //interesting alternative to above, might be one class, with a load of nested-classes...
         //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
 
-        public void fillTree() {
+        public InvestmentOption() {
+            initVariables();
+            //From now on, init specifically means, has to be done at start of program!
+            //Reset means, has to be done at start of some other internal process...
+            initTree(); //unfortunately, fillTree has to come at end of make projection.
+            //but there are initialisation things in fill tree. Need to separate them. 
+            //create an intialiseTree method...
+            //Or a bind to tree method...
+            //OR use the tree itself as main variables.
+            //OR bind the tree to these variables...
+            //OR any of above, just try one... then will see strengths and weaknesses.
+            //FORTUNATELY, labelTree can come at end of make projection!
+            initNodeList();
+        }
+
+        public void initTree() {
             treeView.Nodes.Add(cumIngoings);
                 cumIngoings.Nodes.Add(cumJobIngoings);
                 cumIngoings.Nodes.Add(cumPropertyIngoings);
@@ -141,62 +183,48 @@ namespace InvestmentOptions {
             }
         }
 
-        public void resetTree(TreeNodeCollection nodes) {
-            foreach (Node node in nodes) {
-                node.cumulativeValue = 0;
-                resetTree(node.Nodes);
-            }
-        }
 
-        public InvestmentOption() {
-            fillTree(); //unfortunately, fillTree has to come at end of make projection.
-            //but there are initialisation things in fill tree. Need to separate them. 
-            //create an intialiseTree method...
-            //Or a bind to tree method...
-            //OR use the tree itself as main variables.
-            //OR bind the tree to these variables...
-            //OR any of above, just try one... then will see strengths and weaknesses.
-            //FORTUNATELY, labelTree can come at end of make projection!
-            createNodeList();
-        }
-
-        public void initialSetup() {
-            //Initial setup:
+        public void initVariables() {
             intervals = years * 12;
+        }
+
+        public void resetVariables() {
             moneyBorrowed = housePrice - deposit;
-            moneyOwed = moneyBorrowed;         
+            moneyOwed = moneyBorrowed;
             calculateStudentLoanPayment();
             jobIngoings = jobIncome - studentLoanPayment;
-            bankAccount.contents = 17000;
-            netWorth = bankAccount.contents;
+            bankAccountContents = 17000;
+            netWorth = bankAccountContents;
             tenantCount = 2;
             updateMultiples();
         }
 
         public void autoInvest() {
             //check
-            if (bankAccount.contents > deposit) {
+            if (bankAccountContents > deposit) {
                 //invest
                 moneyBorrowed += housePrice - deposit; // not that important.
                 moneyOwed += housePrice - deposit;
-                bankAccount.contents -= deposit;
+                bankAccountContents -= deposit;
                 //Benefits
                 tenantCount += 2;
                 updateMultiples();
             } //something you forgetting to update. what is it? YES the extra features that make you money!
         }
 
-        public void createNodeList() {
-            bankAccountN = new Node(intervals) { Name = "bankAccount" };
-            netWorthN = new Node(intervals) { Name = "netWorth" };
-            propertyProfitN = new Node(intervals) { Name = "propertyProfit" };
-            tenantsRentN = new Node(intervals) { Name = "tenantsRent" };
-            taxableTenantsRentN = new Node(intervals) { Name = "taxableTenantsRent" };
+        public void initNodeList() {
+            bankAccountN = new Node("bankAccount", intervals);
+            netWorthN = new Node("netWorth", intervals);
+            propertyProfitN = new Node("propertyProfit", intervals);
+            tenantsRentN = new Node("tenantsRent", intervals);
+            taxableTenantsRentN = new Node("taxableTenantsRent", intervals);
+            propertyCostsN = new Node("propertyCosts", intervals);
             nodeList.Add(bankAccountN);
             nodeList.Add(netWorthN);
             nodeList.Add(propertyProfitN);
             nodeList.Add(tenantsRentN);
             nodeList.Add(taxableTenantsRentN);
+            nodeList.Add(propertyCostsN);
         }
 
         public void updateMultiples() {
@@ -215,32 +243,38 @@ namespace InvestmentOptions {
         public void calculatePropertyIncomeTax() {
             //Note, not quite right, if exceeds rent a room scheme limit!
             taxableTenantsRent = tenantsRent;
+            calculatePropertyOutgoings();
+            propertyProfit = taxableTenantsRent - (propertyOutgoings - mortgageRepayment);
             switch (buyType) {
-                case 0: //Buy to live in
-                    taxableTenantsRent = tenantsRent - 4250; //Rent a room scheme...
+                case BuyType.toLiveIn: //Buy to live in
+                    if (rentARoomScheme) {
+                        taxableTenantsRent = tenantsRent - 4250 / 12;
+                        propertyProfit = taxableTenantsRent;
+                    } else {
+                        //do nothing.
+                    }
                     //calculated here, because if use it, CANNOT claim back tax on your letting expenses!
                     //As gen rule, if expenses are LESS than £4250, then rent room scheme is better for you.
                     if (taxableTenantsRent < 0) taxableTenantsRent = 0;
                     break;
-                case 1: //Buy to let
+                case BuyType.toLet: //Buy to let
+                    //do nothing
                     break;
             }
-            calculatePropertyOutgoings();
-            propertyProfit = taxableTenantsRent - (propertyOutgoings - mortgageRepayment);
             propertyIncomeTax = propertyProfit * 0.20f;
             if (propertyIncomeTax < 0) propertyIncomeTax = 0;
         }
 
         public void calculateIngoings() {
             //just have to make sure all equations are well defined here...
-            bankInterest = bankAccount.contents * bankInterestRate; //Monthly interest...
+            bankInterest = bankAccountContents * bankInterestRate; //Monthly interest...
             calculatePropertyIncomeTax();
             ingoings = jobIngoings + bankInterest + tenantsRent - propertyIncomeTax;
         }
 
         public void calculateMortgagePayments(int interval) {
             switch (mortgageType) {
-                case 0: //repaymentMortgage.
+                case MortgageType.repayment: //repaymentMortgage.
                     mortgagePayment = moneyBorrowed * mortgageInterestRate * 
                         ((float) Math.Pow(1 + mortgageInterestRate, intervals)) / 
                         ((float) Math.Pow(1 + mortgageInterestRate,intervals) - 1); //How is this figure obtained? trial and error?
@@ -257,7 +291,7 @@ namespace InvestmentOptions {
                     moneyOwed = moneyOwed - mortgageRepayment;
                     //Console.WriteLine("" + interest);
                     break;
-                case 1: //interestOnlyMortgage
+                case MortgageType.interestOnly: //interestOnlyMortgage
                     mortgageRepayment = 0;
                     //moneyOwed = moneyOwed;
                     mortgageInterest = moneyOwed * mortgageInterestRate;
@@ -278,24 +312,26 @@ namespace InvestmentOptions {
             studentLoanPayment = jobIncome * 0.05f;
         }
 
-        public void makeProjection() {
-            initialSetup(); //makeProjection is runningMethod, not intialisingMethod, so this can't come here.
-            //actually, it can... only CERTAIN initialisation steps that CANNOT be repeated...
+        public void makeProjection(ProjectionPanel panel) {
+            this.projectionPanel = panel;
+            resetVariables();
             resetTree(treeView.Nodes);
-            
+            resetNodeList();
+            //createNodeList();
             for (int interval = 0; interval < intervals; interval++) {
                 //calculations:
                 calculateMortgagePayments(interval);
                 calculateIngoings();
                 calculateOutgoings();
-                bankAccount.contents = bankAccount.contents + ingoings - outgoings;
+                bankAccountContents = bankAccountContents + ingoings - outgoings;
                 netWorth = netWorth + ingoings - outgoings + mortgageRepayment;
                 //STORE IN ARRAYS:
-                bankAccountN.projection[interval] = bankAccount.contents;
+                bankAccountN.projection[interval] = bankAccountContents;
                 netWorthN.projection[interval] = netWorth;
                 propertyProfitN.projection[interval] = propertyProfit;
                 tenantsRentN.projection[interval] = tenantsRent;
                 taxableTenantsRentN.projection[interval] = taxableTenantsRent;
+                propertyCostsN.projection[interval] = propertyOutgoings - mortgageRepayment;
                 //STORE TOTALS:
                 cumIngoings.cumulativeValue += ingoings;
                     cumJobIngoings.cumulativeValue += jobIngoings;
@@ -311,7 +347,7 @@ namespace InvestmentOptions {
                         cumAccountantsFee.cumulativeValue += accountantsFee;
                 cumPropertyIncomeTax.cumulativeValue += propertyIncomeTax;
                 cumStudentLoanRepayments.cumulativeValue += studentLoanPayment;
-                if (mortgageType == 1) autoInvest();
+                if (mortgageType == MortgageType.interestOnly) autoInvest();
                 //REPEATS
                 //writeLine("mP", mortgagePayment);
                 //writeLine("In", ingoings);
@@ -320,6 +356,21 @@ namespace InvestmentOptions {
             }
             mortgagePaymentNode.cumulativeValue = mortgagePayment;
             labelTree(treeView.Nodes);
+        }
+
+        public void resetNodeList() {
+            foreach (Node node in nodeList) {
+                for (int interval = 0; interval < intervals; interval++) {
+                    node.projection[interval] = 0;
+                }
+            }
+        }
+
+        public void resetTree(TreeNodeCollection nodes) {
+            foreach (Node node in nodes) {
+                node.cumulativeValue = 0;
+                resetTree(node.Nodes);
+            }
         }
 
         public override String ToString() {

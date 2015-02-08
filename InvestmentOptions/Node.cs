@@ -10,7 +10,10 @@ namespace InvestmentOptions {
     public class Node : TreeNode {
         //later, if decide treeNode is too heavyWeight, to have loads of,
         // just modify this class, to make it more lightWeight...
-
+        //NOTE: Could make this a generic class, 
+        //to hold floats, and bools...
+        public String Name;
+        public bool boolean;
         public float monthlyValue;
         public float cumulativeValue = 0;
         public float[] projection;
@@ -21,9 +24,11 @@ namespace InvestmentOptions {
             //Do nothing
         }
 
-        public Node(int intervals) {
+        public Node(String name, int intervals) {
             projection = new float[intervals];
             series = new Series();
+            Name = name;
+            series.Name = name;
         }
 
         public void addChild() {

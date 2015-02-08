@@ -32,44 +32,41 @@ namespace InvestmentOptions {
         public void presentOptionCombination() {
             InvestmentOption interestOnlyMortgage = new InvestmentOption();
             interestOnlyMortgage.Name = "interestOnlyMortgage";
-            interestOnlyMortgage.mortgageType = 1;
-            interestOnlyMortgage.buyType = 1;
+            interestOnlyMortgage.mortgageType = InvestmentOption.MortgageType.interestOnly;
+            interestOnlyMortgage.buyType = InvestmentOption.BuyType.toLet;
             options.Add(interestOnlyMortgage);
             //form.presentInvestmentOption(interestOnlyMortgage);
 
-            InvestmentOption interestOnlyBTLM = new InvestmentOption();
-            interestOnlyBTLM.Name = "interestOnlyBTLM";
-            interestOnlyBTLM.mortgageType = 1;
-            interestOnlyBTLM.buyType = 0;
-            interestOnlyBTLM.tenantCount = 1;
-            interestOnlyBTLM.rent = 0;
-            options.Add(interestOnlyBTLM);
+            InvestmentOption interestOnlyLiveIn = new InvestmentOption();
+            interestOnlyLiveIn.Name = "interestOnlyLiveIn";
+            interestOnlyLiveIn.mortgageType = InvestmentOption.MortgageType.interestOnly;
+            interestOnlyLiveIn.buyType = InvestmentOption.BuyType.toLiveIn;
+            interestOnlyLiveIn.tenantCount = 1;
+            interestOnlyLiveIn.rent = 0;
+            options.Add(interestOnlyLiveIn);
 
             InvestmentOption repaymentMortgage = new InvestmentOption();
             repaymentMortgage.Name = "repaymentMortgage";
-            repaymentMortgage.mortgageType = 0;
-            repaymentMortgage.buyType = 1;
+            repaymentMortgage.mortgageType = InvestmentOption.MortgageType.repayment;
+            repaymentMortgage.buyType = InvestmentOption.BuyType.toLet;
             options.Add(repaymentMortgage);
            
             InvestmentOption buyToLiveMortgage = new InvestmentOption();
             buyToLiveMortgage.Name = "buyToLiveMortgage";
-            buyToLiveMortgage.mortgageType = 0;
-            buyToLiveMortgage.buyType = 0;
+            buyToLiveMortgage.mortgageType = InvestmentOption.MortgageType.repayment;
+            buyToLiveMortgage.buyType = InvestmentOption.BuyType.toLiveIn;
             buyToLiveMortgage.tenantCount = 1;
             buyToLiveMortgage.rent = 0;
             options.Add(buyToLiveMortgage);
 
-            InvestmentOption threeBedBTLM = new InvestmentOption();
-            threeBedBTLM.Name = "threeBedBTLM";
-            threeBedBTLM.mortgageType = 0;
-            threeBedBTLM.buyType = 0;
-            threeBedBTLM.tenantsRent = threeBedBTLM.tenantsRent;
-            threeBedBTLM.agentsFee = threeBedBTLM.agentsFee;
-            threeBedBTLM.wearAndTear = threeBedBTLM.wearAndTear;
-            threeBedBTLM.accountantsFee = 0;
-            threeBedBTLM.rent = 0;
-            threeBedBTLM.housePrice = 125000;
-            options.Add(threeBedBTLM);
+            InvestmentOption threeBedLiveIn = new InvestmentOption();
+            threeBedLiveIn.Name = "threeBedLiveIn";
+            threeBedLiveIn.mortgageType = InvestmentOption.MortgageType.repayment;
+            threeBedLiveIn.buyType = InvestmentOption.BuyType.toLiveIn;
+            threeBedLiveIn.accountantsFee = 0;
+            threeBedLiveIn.rent = 0;
+            threeBedLiveIn.housePrice = 125000;
+            options.Add(threeBedLiveIn);
 
             //form.presentInvestmentOptions(repaymentMortgage, buyToLiveMortgage);
             //form.presentInvestmentOptions(buyToLiveMortgage, threeBedBTLM);

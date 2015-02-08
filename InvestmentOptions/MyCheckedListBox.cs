@@ -7,6 +7,13 @@ using System.Windows.Forms;
 namespace InvestmentOptions {
 
     public class MyCheckedListBox : CheckedListBox {
+        //This is a real mess. Let us not use this again...
+        //Let us just have objects, that have properties, like show, or not.
+        //Let us put them in lists...
+        //Let us find a way of showing them, perhaps in a listView, or just a form,
+        //which can hold check boxes etc.
+        //Just like you did in Android.
+        //Much more flexible that way...
         ProjectionForm form;
 
         public MyCheckedListBox(ProjectionForm form) {
@@ -37,7 +44,7 @@ namespace InvestmentOptions {
                             myCheckedItems.Insert(0, newItem); //means is at top of list, so put in at front.
                         }
                     }
-                }  
+                }
             } //great, seems to work, now just need to define what happens when UNCHECKED:
             if (checkEvent.NewValue == CheckState.Unchecked) {
                 //need to update myCheckedItems here to, because CheckedItems not changed yet...

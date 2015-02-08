@@ -11,38 +11,72 @@ namespace InvestmentOptions {
 
     public class ProjectionPanel : FlowLayoutPanel {
         //CHART 1
-        private Chart chart1 = new Chart();
         public InvestmentOption option;
         public List<Node> nodeList;
 
-        public ProjectionPanel() {
+        public ProjectionPanel(InvestmentOption option) {
             //PANEL STUFF
             Text = "Christiaan Panel";
             FlowDirection = FlowDirection.TopDown;
+            //OTHER
+            this.option = option;
+            this.nodeList = option.nodeList;  
+            initialiseChildren();
         }
 
         public void presentInvestmentOption(InvestmentOption option) {
-            this.option = option;
-            this.nodeList = option.nodeList;
             showCharts();
             showDetails();
         }
 
-        public void setupChart(Chart chart) {
+        public void initialiseChildren() {
+            //SETUP OPTIONS
+            initialiseOptions();
+            //INSTANTIATE
+            Chart chart1 = new Chart();
+            Chart chart2 = new Chart();
+            //SETUP CHARTS
+            initialiseChart(chart1);
+            chart1.ChartAreas[0].AxisY.Maximum = 300000;
+            //title1.DockedToChartArea = chart1.ChartAreas[0].Name;
+            initialiseChart(chart2);
+            //chart2.Titles[0].DockedToChartArea = chart2.ChartAreas[0].Name;
+            //SETUP SERIES
+            List<Node> nodeList = this.nodeList;
+            for (int node = 0; node < nodeList.Count; node++) {
+                if (node < 2) {
+                    initialiseSeries(chart1, nodeList[node].series, nodeList[node].projection);
+                } else {
+                    initialiseSeries(chart2, nodeList[node].series, nodeList[node].projection);
+                }
+            }
+        }
+
+        public void initialiseChart(Chart chart) {
             ChartArea chartArea = new ChartArea();
             Legend legend = new Legend();
             chart.ChartAreas.Add(chartArea);
-            chart.Size = new Size(500, 225);
-            chart.Text = "chart1";      
+            chart.Size = new Size(500, 200);
+            chart.Text = "chart1";
             Controls.Add(chart);
             Title title1 = new Title(option.Name, Docking.Top, new Font("Verdana", 12), Color.Black);
-            chart1.Titles.Add(title1);
+            chart.Titles.Add(title1);
             chart.Legends.Add(legend);
         }
 
-        public void setupSeries(Chart chart1, Series series, float[] projection) {
+        public void initialiseOptions() {
+            CheckBox rentARoomSchemeCheckBox = new CheckBox(); 
+            Controls.Add(rentARoomSchemeCheckBox);
+            rentARoomSchemeCheckBox.Name = "rentARoomScheme";
+            rentARoomSchemeCheckBox.Text = rentARoomSchemeCheckBox.Name;
+            Binding binding = new Binding("Checked", option, "rentARoomScheme");
+            binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
+            rentARoomSchemeCheckBox.DataBindings.Add(binding);  
+        }
+
+        public void initialiseSeries(Chart chart, Series series, float[] projection) {
             series.ChartType = SeriesChartType.FastLine;
-            chart1.Series.Add(series);
+            chart.Series.Add(series);
             series.LegendText = series.Name;
             series.Points.AddY(projection[0]); //Just to initialise Points...
         }
@@ -55,30 +89,16 @@ namespace InvestmentOptions {
 
         public void showCharts() {
             //Make projection
-            option.makeProjection();
-            //INSTANTIATE
-            Chart chart1 = new Chart();
-            Chart chart2 = new Chart();
-            //SETUP CHARTS
-            setupChart(chart1);
-            chart1.ChartAreas[0].AxisY.Maximum = 300000;
-            //title1.DockedToChartArea = chart1.ChartAreas[0].Name;
-            setupChart(chart2);
-            //chart2.Titles[0].DockedToChartArea = chart2.ChartAreas[0].Name;
-            //SETUP SERIES
-            List<Node> nodeList = this.nodeList;
+            option.makeProjection(this);
+            //RESET THE SERIES
             for (int node = 0; node < nodeList.Count; node++) {
-                if (node < 2) {
-                    setupSeries(chart1, nodeList[node].series, option.netWorthN.projection);
-                } else {
-                    setupSeries(chart2, nodeList[node].series, option.bankAccountN.projection);
-                }
+                nodeList[node].series.Points.Clear();
             }
             //PLOT STUFF
             int[] intervals = new int[option.intervals];
             for (int interval = 1; interval < intervals.Count(); interval++) {
                 //create points, because it is easier to watch.
-                for (int node = 1; node < nodeList.Count; node++) {
+                for (int node = 0; node < nodeList.Count; node++) {
                     nodeList[node].series.Points.AddY(nodeList[node].projection[interval]);
                 }
             }

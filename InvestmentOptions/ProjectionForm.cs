@@ -50,7 +50,7 @@ namespace InvestmentOptions {
 
         public void presentCheckedOptions(List<InvestmentOption> checkedOptions) {
             for (int optionNo = 0; optionNo < checkedOptions.Count; optionNo++) {
-                ProjectionPanel panel = new ProjectionPanel();
+                ProjectionPanel panel = new ProjectionPanel((InvestmentOption) checkedOptions[optionNo]);
                 addProjectionPanel(panel, optionNo, checkedOptions.Count);
                 panel.Dock = DockStyle.Fill;
                 panel.presentInvestmentOption((InvestmentOption) checkedOptions[optionNo]);
