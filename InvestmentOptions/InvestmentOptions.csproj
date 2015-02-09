@@ -50,6 +50,8 @@
     <Compile Include="ControlPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="LivingCosts.cs" />
+    <Compile Include="Mortgage.cs" />
     <Compile Include="MyCheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -35,19 +35,27 @@ namespace InvestmentOptions {
             //INSTANTIATE
             Chart chart1 = new Chart();
             Chart chart2 = new Chart();
+            Chart chart3 = new Chart();
             //SETUP CHARTS
             initialiseChart(chart1);
             chart1.ChartAreas[0].AxisY.Maximum = 300000;
             //title1.DockedToChartArea = chart1.ChartAreas[0].Name;
             initialiseChart(chart2);
+            chart2.ChartAreas[0].AxisY.Maximum = 4000;
             //chart2.Titles[0].DockedToChartArea = chart2.ChartAreas[0].Name;
+            initialiseChart(chart3);
+            chart3.ChartAreas[0].AxisY.Maximum = 4000;
             //SETUP SERIES
             List<Node> nodeList = this.nodeList;
             for (int node = 0; node < nodeList.Count; node++) {
                 if (node < 2) {
                     initialiseSeries(chart1, nodeList[node].series, nodeList[node].projection);
-                } else {
+                }
+                else if (2 <= node && node < 6) {
                     initialiseSeries(chart2, nodeList[node].series, nodeList[node].projection);
+                }
+                else {
+                    initialiseSeries(chart3, nodeList[node].series, nodeList[node].projection);
                 }
             }
         }
@@ -56,7 +64,7 @@ namespace InvestmentOptions {
             ChartArea chartArea = new ChartArea();
             Legend legend = new Legend();
             chart.ChartAreas.Add(chartArea);
-            chart.Size = new Size(500, 200);
+            chart.Size = new Size(500, 170);
             chart.Text = "chart1";
             Controls.Add(chart);
             Title title1 = new Title(option.Name, Docking.Top, new Font("Verdana", 12), Color.Black);
@@ -70,6 +78,8 @@ namespace InvestmentOptions {
             rentARoomSchemeCheckBox.Name = "rentARoomScheme";
             rentARoomSchemeCheckBox.Text = rentARoomSchemeCheckBox.Name;
             Binding binding = new Binding("Checked", option, "rentARoomScheme");
+            //of course! A property, is NOT a field. It is the get/setter for the field!
+            //the properties name should NEVER change, after release, so ok to use a string!
             binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
             rentARoomSchemeCheckBox.DataBindings.Add(binding);  
         }
@@ -82,7 +92,7 @@ namespace InvestmentOptions {
         }
 
         public void showDetails() {
-            option.treeView.Size = new Size(500, 250); //might be better to make it property of panel,
+            option.treeView.Size = new Size(500, 150); //might be better to make it property of panel,
             //then pass it to option, to have stuff added to it...
             Controls.Add(option.treeView);
         }

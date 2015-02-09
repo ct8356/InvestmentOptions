@@ -65,7 +65,7 @@ namespace InvestmentOptions {
             threeBedLiveIn.buyType = InvestmentOption.BuyType.toLiveIn;
             threeBedLiveIn.accountantsFee = 0;
             threeBedLiveIn.rent = 0;
-            threeBedLiveIn.housePrice = 125000;
+            threeBedLiveIn.mortgage.housePrice = 125000;
             options.Add(threeBedLiveIn);
 
             //form.presentInvestmentOptions(repaymentMortgage, buyToLiveMortgage);
