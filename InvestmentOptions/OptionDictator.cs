@@ -22,8 +22,7 @@ namespace InvestmentOptions {
             ProjectionForm form = new ProjectionForm();
             InvestmentOption statusQuo = new InvestmentOption(); //this is a hypothetical scenario/world.
             InvestmentOption flatNottingham = new InvestmentOption();
-            flatNottingham.rent = 0;
-            flatNottingham.mortgagePayment = 100;
+            flatNottingham.mortgage.payment.monthlyValue = 100;
             //therefore, it should have its own real world properties, like bankAccountContents, and years... 
             //(model scale).
             //form.presentInvestmentOptions();
@@ -32,39 +31,38 @@ namespace InvestmentOptions {
         public void presentOptionCombination() {
             InvestmentOption interestOnlyMortgage = new InvestmentOption();
             interestOnlyMortgage.Name = "interestOnlyMortgage";
-            interestOnlyMortgage.mortgageType = InvestmentOption.MortgageType.interestOnly;
-            interestOnlyMortgage.buyType = InvestmentOption.BuyType.toLet;
+            interestOnlyMortgage.mortgage.type = Mortgage.Type.interestOnly;
+            interestOnlyMortgage.property.buyType = Property.BuyType.toLet;
             options.Add(interestOnlyMortgage);
             //form.presentInvestmentOption(interestOnlyMortgage);
+            //NOTE, should just make a constructor that does this stuff!
+            //saves writing...
 
             InvestmentOption interestOnlyLiveIn = new InvestmentOption();
             interestOnlyLiveIn.Name = "interestOnlyLiveIn";
-            interestOnlyLiveIn.mortgageType = InvestmentOption.MortgageType.interestOnly;
-            interestOnlyLiveIn.buyType = InvestmentOption.BuyType.toLiveIn;
-            interestOnlyLiveIn.tenantCount = 1;
-            interestOnlyLiveIn.rent = 0;
+            interestOnlyLiveIn.mortgage.type = Mortgage.Type.interestOnly;
+            interestOnlyLiveIn.property.buyType = Property.BuyType.toLiveIn;
+            interestOnlyLiveIn.property.originalTenantCount = 1;
             options.Add(interestOnlyLiveIn);
 
             InvestmentOption repaymentMortgage = new InvestmentOption();
             repaymentMortgage.Name = "repaymentMortgage";
-            repaymentMortgage.mortgageType = InvestmentOption.MortgageType.repayment;
-            repaymentMortgage.buyType = InvestmentOption.BuyType.toLet;
+            repaymentMortgage.mortgage.type = Mortgage.Type.repayment;
+            repaymentMortgage.property.buyType = Property.BuyType.toLet;
             options.Add(repaymentMortgage);
            
             InvestmentOption buyToLiveMortgage = new InvestmentOption();
             buyToLiveMortgage.Name = "buyToLiveMortgage";
-            buyToLiveMortgage.mortgageType = InvestmentOption.MortgageType.repayment;
-            buyToLiveMortgage.buyType = InvestmentOption.BuyType.toLiveIn;
-            buyToLiveMortgage.tenantCount = 1;
-            buyToLiveMortgage.rent = 0;
+            buyToLiveMortgage.mortgage.type = Mortgage.Type.repayment;
+            buyToLiveMortgage.property.buyType = Property.BuyType.toLiveIn;
+            buyToLiveMortgage.property.originalTenantCount = 1;
             options.Add(buyToLiveMortgage);
 
             InvestmentOption threeBedLiveIn = new InvestmentOption();
             threeBedLiveIn.Name = "threeBedLiveIn";
-            threeBedLiveIn.mortgageType = InvestmentOption.MortgageType.repayment;
-            threeBedLiveIn.buyType = InvestmentOption.BuyType.toLiveIn;
-            threeBedLiveIn.accountantsFee = 0;
-            threeBedLiveIn.rent = 0;
+            threeBedLiveIn.mortgage.type = Mortgage.Type.repayment;
+            threeBedLiveIn.property.buyType = Property.BuyType.toLiveIn;
+            threeBedLiveIn.property.accountantsFee.monthlyValue = 0;
             threeBedLiveIn.mortgage.housePrice = 125000;
             options.Add(threeBedLiveIn);
 
