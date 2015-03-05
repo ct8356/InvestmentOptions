@@ -6,8 +6,9 @@ using System.Windows.Forms;
 
 namespace InvestmentOptions {
     public class Mortgage : BranchNode {
-        public enum Type { repayment, interestOnly };
-        public Type type;
+        public enum BuyType { repayment, interestOnly };
+        public BuyType type;
+        public InvestmentOption option;
         //MORTGAGE PAYMENTS
         public float housePrice = 100000;
         public float deposit = 25000;
@@ -15,15 +16,18 @@ namespace InvestmentOptions {
         public LeafNode repayment;
         public float moneyOwed;
         public LeafNode interest;
+        public LeafNode debtReduced;
         public float interestRate = 0.065f / 12; //apparently, 6.5% annual is NOT a cumulative rate...
         //0.00408f; //monthly interest rate (number works well for 5% annual).
         //try 487 for 6% annual.
         public LeafNode payment;
 
-        public Mortgage() {
-            Nodes.Add(repayment = new LeafNode("repayment", intervals));
-            Nodes.Add(interest = new LeafNode("interest", intervals));
-            Nodes.Add(payment = new LeafNode("payment", intervals));
+        public Mortgage(InvestmentOption option) : base("mortgage", option) {
+            this.option = option;
+            Nodes.Add(repayment = new LeafNode("mortgageRepayment", option));
+            Nodes.Add(interest = new LeafNode("mortgageinterest", option));
+            Nodes.Add(payment = new LeafNode("mortgagePayment", option));
+            Nodes.Add(debtReduced = new LeafNode("debtReduced", option));
         } //YOU KNOW WHAT? I just realised, that don't actually need to give
         //references to these objects.
         //Because strictly, they would be created by user.
@@ -32,20 +36,30 @@ namespace InvestmentOptions {
 
         public void calculateMortgagePayments(int interval) {
             switch (type) {
-                case Mortgage.Type.repayment: //repaymentMortgage.
-                    payment.monthlyValue = moneyBorrowed * interestRate *
+                case Mortgage.BuyType.repayment: //repaymentMortgage.
+                    payment.mv = moneyBorrowed * interestRate *
                         ((float)Math.Pow(1 + interestRate, intervals)) /
                         ((float)Math.Pow(1 + interestRate, intervals) - 1);
-                    interest.monthlyValue = moneyOwed * interestRate;
-                    repayment.monthlyValue = payment.monthlyValue - interest.monthlyValue;
-                    moneyOwed = moneyOwed - repayment.monthlyValue;
+                    interest.mv = moneyOwed * interestRate;
+                    repayment.mv = payment.mv - interest.mv;
+                    moneyOwed = moneyOwed - repayment.mv;
                     break;
-                case Mortgage.Type.interestOnly: //interestOnlyMortgage
-                    repayment.monthlyValue = 0;
-                    interest.monthlyValue = moneyOwed * interestRate;
-                    payment.monthlyValue = interest.monthlyValue;
+                case Mortgage.BuyType.interestOnly: //interestOnlyMortgage
+                    repayment.mv = 0;
+                    interest.mv = moneyOwed * interestRate;
+                    payment.mv = interest.mv;
                     break;
             }
+            debtReduced.mv = repayment.mv;
+        }
+
+        public void resetVariables() {
+            moneyBorrowed = option.realWorldTree.property.originalPropertyCount * (housePrice - deposit);
+            if (option.noMortgageNeeded) {
+                option.realWorldTree.property.moneyInvested = housePrice;
+                moneyBorrowed = 0;
+            }
+            moneyOwed = moneyBorrowed;
         }
 
         //public void calculateMortgagePayments(int interval) {

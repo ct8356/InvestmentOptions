@@ -8,13 +8,20 @@ namespace InvestmentOptions {
     public class MyTreeNode : TreeNode {
 
         public int intervals;
+        public string label { get; set; }
+        //public new string Text {
+        //    get { return label; }
+        //    set { label = value; base.Text = ""; }
+        //}
 
         public MyTreeNode() {
             //do nothing
+            Text = Name;
         }
 
-        public MyTreeNode(int intervals) {
-            this.intervals = intervals;
+        public MyTreeNode(String name, InvestmentOption option) {
+            Text = name;
+            intervals = option.intervals;
         }
     }
 }

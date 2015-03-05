@@ -7,71 +7,86 @@ using System.Windows.Forms;
 namespace InvestmentOptions {
 
     class OptionDictator {
-
-        ProjectionForm form = new ProjectionForm();
-        //Can only be ONE form, because only 1 form can run at a time...
-        List<InvestmentOption> options = new List<InvestmentOption>();
+        ProjectionForm form;//Can only be ONE form, because only 1 form can run at a time...
+        public List<InvestmentOption> options = new List<InvestmentOption>();
 
         public OptionDictator() {
-            presentOptionCombination();
+            form = new ProjectionForm();
+            createOptionCombination();
+            form.setupTheRest(options);
             //better, because can change it easily, just by calling a different method...
+            Application.Run(form);
+            //seems like it does not continue with the rest of code until this is closed..
+            //try putting it at the end...
         }
 
-        public void presentOptionCombination1() {
+        public void createOptionCombination1() {
             //This is where lionShare of conducting is done!
             ProjectionForm form = new ProjectionForm();
-            InvestmentOption statusQuo = new InvestmentOption(); //this is a hypothetical scenario/world.
-            InvestmentOption flatNottingham = new InvestmentOption();
-            flatNottingham.mortgage.payment.monthlyValue = 100;
+            InvestmentOption statusQuo = new InvestmentOption(form); //this is a hypothetical scenario/world.
+            InvestmentOption flatNottingham = new InvestmentOption(form);
+            flatNottingham.realWorldTree.mortgage.payment.mv = 100;
             //therefore, it should have its own real world properties, like bankAccountContents, and years... 
             //(model scale).
             //form.presentInvestmentOptions();
         }
 
-        public void presentOptionCombination() {
-            InvestmentOption interestOnlyMortgage = new InvestmentOption();
+        public void createOptionCombination() {
+            InvestmentOption interestOnlyMortgage = new InvestmentOption(form);
             interestOnlyMortgage.Name = "interestOnlyMortgage";
-            interestOnlyMortgage.mortgage.type = Mortgage.Type.interestOnly;
-            interestOnlyMortgage.property.buyType = Property.BuyType.toLet;
+            interestOnlyMortgage.realWorldTree.mortgage.type = Mortgage.BuyType.interestOnly;
+            interestOnlyMortgage.realWorldTree.property.buyType = Property.BuyType.toLet;
             options.Add(interestOnlyMortgage);
-            //form.presentInvestmentOption(interestOnlyMortgage);
             //NOTE, should just make a constructor that does this stuff!
             //saves writing...
 
-            InvestmentOption interestOnlyLiveIn = new InvestmentOption();
+            InvestmentOption interestOnlyLiveIn = new InvestmentOption(form);
             interestOnlyLiveIn.Name = "interestOnlyLiveIn";
-            interestOnlyLiveIn.mortgage.type = Mortgage.Type.interestOnly;
-            interestOnlyLiveIn.property.buyType = Property.BuyType.toLiveIn;
-            interestOnlyLiveIn.property.originalTenantCount = 1;
+            interestOnlyLiveIn.realWorldTree.mortgage.type = Mortgage.BuyType.interestOnly;
+            interestOnlyLiveIn.realWorldTree.property.buyType = Property.BuyType.toLiveIn;
+            interestOnlyLiveIn.realWorldTree.property.originalTenantCount = 1;
             options.Add(interestOnlyLiveIn);
 
-            InvestmentOption repaymentMortgage = new InvestmentOption();
+            InvestmentOption repaymentMortgage = new InvestmentOption(form);
             repaymentMortgage.Name = "repaymentMortgage";
-            repaymentMortgage.mortgage.type = Mortgage.Type.repayment;
-            repaymentMortgage.property.buyType = Property.BuyType.toLet;
+            repaymentMortgage.realWorldTree.mortgage.type = Mortgage.BuyType.repayment;
+            repaymentMortgage.realWorldTree.property.buyType = Property.BuyType.toLet;
             options.Add(repaymentMortgage);
-           
-            InvestmentOption buyToLiveMortgage = new InvestmentOption();
+
+            InvestmentOption buyToLiveMortgage = new InvestmentOption(form);
             buyToLiveMortgage.Name = "buyToLiveMortgage";
-            buyToLiveMortgage.mortgage.type = Mortgage.Type.repayment;
-            buyToLiveMortgage.property.buyType = Property.BuyType.toLiveIn;
-            buyToLiveMortgage.property.originalTenantCount = 1;
+            buyToLiveMortgage.realWorldTree.mortgage.type = Mortgage.BuyType.repayment;
+            buyToLiveMortgage.realWorldTree.property.buyType = Property.BuyType.toLiveIn;
+            buyToLiveMortgage.realWorldTree.property.originalTenantCount = 1;
             options.Add(buyToLiveMortgage);
 
-            InvestmentOption threeBedLiveIn = new InvestmentOption();
+            InvestmentOption threeBedLiveIn = new InvestmentOption(form);
             threeBedLiveIn.Name = "threeBedLiveIn";
-            threeBedLiveIn.mortgage.type = Mortgage.Type.repayment;
-            threeBedLiveIn.property.buyType = Property.BuyType.toLiveIn;
-            threeBedLiveIn.property.accountantsFee.monthlyValue = 0;
-            threeBedLiveIn.mortgage.housePrice = 125000;
+            threeBedLiveIn.realWorldTree.mortgage.type = Mortgage.BuyType.repayment;
+            threeBedLiveIn.realWorldTree.property.buyType = Property.BuyType.toLiveIn;
+            threeBedLiveIn.realWorldTree.mortgage.housePrice = 125000;
             options.Add(threeBedLiveIn);
 
-            //form.presentInvestmentOptions(repaymentMortgage, buyToLiveMortgage);
-            //form.presentInvestmentOptions(buyToLiveMortgage, threeBedBTLM);
-            form.presentInvestmentOptions(options);
-            Application.Run(form); 
-            //seems like it does not continue with the rest of code until this is closed..
-            //try putting it at the end...
+            InvestmentOption zeroInvestment = new InvestmentOption(form);
+            zeroInvestment.Name = "zeroInvestment";
+            zeroInvestment.realWorldTree.mortgage.type = Mortgage.BuyType.repayment;
+            zeroInvestment.realWorldTree.property.buyType = Property.BuyType.toLiveIn;
+            zeroInvestment.zeroInvestment = true;
+            options.Add(zeroInvestment);
+
+            InvestmentOption hundredGrandFromStart = new InvestmentOption(form);
+            hundredGrandFromStart.Name = "hundredGrandFromStart";
+            hundredGrandFromStart.realWorldTree.mortgage.type = Mortgage.BuyType.interestOnly;
+            hundredGrandFromStart.realWorldTree.property.buyType = Property.BuyType.toLet;
+            hundredGrandFromStart.noMortgageNeeded = true;
+            options.Add(hundredGrandFromStart);
+
+            InvestmentOption hundredGrand4houses = new InvestmentOption(form);
+            hundredGrand4houses.Name = "hundredGrand4houses";
+            hundredGrand4houses.realWorldTree.mortgage.type = Mortgage.BuyType.interestOnly;
+            hundredGrand4houses.realWorldTree.property.buyType = Property.BuyType.toLet;
+            hundredGrand4houses.realWorldTree.property.originalPropertyCount = 4;
+            options.Add(hundredGrand4houses);
         }
 
     }

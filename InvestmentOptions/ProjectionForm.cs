@@ -12,56 +12,81 @@ namespace InvestmentOptions {
 
     public class ProjectionForm : Form {
         private IContainer components = null;
-        private ControlPanel controlPanel;
+        public ControlPanel controlPanel;
         public TableLayoutPanel tablePanel = new TableLayoutPanel();
         private float controlPanelWidth = 15;
+        public List<InvestmentOption> optionsList;
+        public List<ProjectionPanel> panelList;
 
         public ProjectionForm() {
             ClientSize = new Size(700, 600);
             WindowState = FormWindowState.Maximized;
             Text = "Christiaan Form";
-            //Screw it, lets just use the tableLayoutPanel...
             tablePanel.Dock = DockStyle.Fill;
             tablePanel.RowCount = 0;
+            //CONTROL PANEL
             tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, controlPanelWidth));
             controlPanel = new ControlPanel(this);
+            controlPanel.realWorldTreeView.NodeMouseClick += new TreeNodeMouseClickEventHandler(updatePanels);
+            //YOU KNOW! I think it makes sense to make an object SET ITS SELF UP,
+            //in the constructor...
+            //PANEL LIST
+            panelList = new List<ProjectionPanel>();
+            //ADD CONTROLS
             tablePanel.Controls.Add(controlPanel, 0, 0); //in first column
+            //tablePanel.SetRowSpan(controlPanel, 2);
             Controls.Add(tablePanel);
+            //controlPanel.listBox.SetItemChecked(0, true); //ensures first one always checked.     
+            //remember, was always an error with first code for optionsListControlBox (first checkbox)...
+            //again, probs something to do with WEIRD calls, outside your control...
+            //Could fight it with a if statement...       
+        }
+
+        public void setupTheRest(List<InvestmentOption> optionsList) {
+            this.optionsList = optionsList;
+            controlPanel.listBox.Items.AddRange(optionsList.ToArray());
+            addPanels();
+            controlPanel.listBox.SetItemChecked(0, true);
+            //controlPanel.listBox.SetItemChecked(2, true);
         }
         
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
-                components.Dispose();
+        public void addPanels() {
+            //int checkedItemsCount = controlPanel.listBox.CheckedItems.Count;//lets not use. Unreliable.
+            int columnNo = 0;
+            for (int optionNo = 0; optionNo < optionsList.Count; optionNo++) {         
+                InvestmentOption option = optionsList[optionNo];
+                if (option.showInPanel) {             
+                    ProjectionPanel panel = new ProjectionPanel(option, this);
+                    addProjectionPanel(panel, columnNo, controlPanel.listBox.checkedItemsCount);
+                    panel.Dock = DockStyle.Fill;
+                    panel.updateSelf();
+                    columnNo++;
+                }
             }
-            base.Dispose(disposing);
-        }
+        }//BEST just bind the checkbox, to the bool!
 
-        public void presentInvestmentOptions(List<InvestmentOption> optionsList) {
-            controlPanel.listBox.Items.AddRange(optionsList.ToArray());
-            controlPanel.listBox.SetItemChecked(0, true); //ensures first one always checked.
-            List<InvestmentOption> checkedOptionsList = optionsList.GetRange(0, 1); 
-            //paired with above line //(awks, but nec coz CheckedItems is crap!)
-            presentCheckedOptions(checkedOptionsList);
-        }
-
-        public void presentCheckedOptions(List<InvestmentOption> checkedOptions) {
-            for (int optionNo = 0; optionNo < checkedOptions.Count; optionNo++) {
-                ProjectionPanel panel = new ProjectionPanel((InvestmentOption) checkedOptions[optionNo]);
-                addProjectionPanel(panel, optionNo, checkedOptions.Count);
-                panel.Dock = DockStyle.Fill;
-                panel.presentInvestmentOption((InvestmentOption) checkedOptions[optionNo]);
-            }
-        }
-
-        public void addProjectionPanel(ProjectionPanel panel, int column, int count) {
-            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, (100f-controlPanelWidth)/(count)));
-            //tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85f));
+        public void addProjectionPanel(ProjectionPanel panel, int column, int checkedItemsCount) {
+            int colCount = tablePanel.ColumnStyles.Count;
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, (100f - controlPanelWidth) / checkedItemsCount));
             tablePanel.Controls.Add(panel, 1+column, 0);
         }
 
+        protected override void Dispose(bool disposing) {
+            // Clean up any resources being used.
+            if (disposing && (components != null)) {
+                components.Dispose();
+            }
+            base.Dispose(disposing);//true if managed resources should be disposed; otherwise, false.
+        }
+
+        public void updatePanels(Object sender, TreeNodeMouseClickEventArgs e) {
+            //DELETE OLD PANELS
+            for (int controlNo = (tablePanel.Controls.Count - 1); controlNo > 0; controlNo--) {
+                tablePanel.ColumnStyles.RemoveAt(controlNo);
+                tablePanel.Controls.RemoveAt(controlNo);
+            }
+            //ADD NEW ONES
+            addPanels();
+        }
     }
 }

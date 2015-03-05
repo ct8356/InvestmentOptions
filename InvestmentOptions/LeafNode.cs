@@ -10,12 +10,11 @@ namespace InvestmentOptions {
     public class LeafNode : MyTreeNode {
         //later, if decide treeNode is too heavyWeight, to have loads of,
         // just modify this class, to make it more lightWeight...
-        //NOTE: Could make this a generic class, 
-        //to hold floats, and bools...
+        //NOTE: Could make this a generic class, to hold floats, and bools...
         public String Name;
         public bool boolean;
-        public List<bool> showInChartBooleans = new List<bool>();
-        public float monthlyValue;
+        public List<bool> showInChartList = new List<bool>();
+        public float mv;
         public float cumulativeValue = 0;
         public float[] projection;
         public Series series;
@@ -25,20 +24,23 @@ namespace InvestmentOptions {
             //Do nothing
         }
 
-        public LeafNode(String name, int intervals) {
-            projection = new float[intervals];
+        public LeafNode(String name, InvestmentOption option) : base(name, option) {
+            projection = new float[option.intervals];
             series = new Series();
             Name = name;
             series.Name = name;
+            Text = name;
             initialiseSeries();
+            showInChartList.Add(false);
+            showInChartList.Add(false);
+            showInChartList.Add(false);
+            showInChartList.Add(false);
         }
 
         public void initialiseSeries() {
             series.ChartType = SeriesChartType.FastLine;
-            //chart.Series.Add(series);
             series.LegendText = series.Name;
-            //series.Points.AddY(projection[0]); //Just to initialise Points...
-        } //Do this in LeafNode...
+        }
 
         public void addChild() {
             //Not needed now.
@@ -59,5 +61,6 @@ namespace InvestmentOptions {
         public void traverseDescendants() {
 
         }
+
     }
 }

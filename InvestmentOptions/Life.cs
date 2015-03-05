@@ -7,11 +7,11 @@ using System.Windows.Forms;
 namespace InvestmentOptions {
     public class Life : BranchNode {
 
-        public LeafNode outgoings = new LeafNode();
-        public LeafNode _costs;
+        public LeafNode outgoings;
+        LeafNode _costs;
         public LeafNode costs {
             get {
-                _costs.monthlyValue = phoneBill + food + randomObjects + danceLessons + randomEventsAndServices
+                _costs.mv = phoneBill + food + randomObjects + danceLessons + randomEventsAndServices
                     + charity;
                 return _costs;
             }
@@ -32,9 +32,9 @@ namespace InvestmentOptions {
         //I will just have to put up with it for today...
         //it is a small cost...
 
-        public Life() {
-            Nodes.Add(outgoings = new LeafNode("outgoings", intervals));
-            Nodes.Add(costs = new LeafNode("costs", intervals));
+        public Life(InvestmentOption option) : base("life", option) {
+            Nodes.Add(outgoings = new LeafNode("lifeOutgoings", option));
+            Nodes.Add(costs = new LeafNode("lifecosts", option));
         }
 
         //public float sum {

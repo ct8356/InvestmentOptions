@@ -4,7 +4,10 @@ using System.Linq;
 using System.Windows.Forms;
 
 namespace InvestmentOptions {
-    
+
+    //public delegate void MyEventHandler(); //This can go anywhere I think?
+    //BUT I think the one you want, has already been defined anyway....
+
     static class Program {
 
         /// <summary>

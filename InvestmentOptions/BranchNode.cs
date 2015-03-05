@@ -6,7 +6,7 @@ using System.Text;
 namespace InvestmentOptions {
     public class BranchNode : MyTreeNode {
 
-        public BranchNode() {
+        public BranchNode(String name, InvestmentOption option) : base(name, option) {
             //do nothing
         }
 

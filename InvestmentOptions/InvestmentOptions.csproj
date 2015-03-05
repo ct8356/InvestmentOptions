@@ -51,6 +51,7 @@
     <Compile Include="ControlPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Job.cs" />
     <Compile Include="Life.cs" />
     <Compile Include="Mortgage.cs" />
     <Compile Include="MyCheckedListBox.cs">
@@ -72,6 +73,7 @@
     <Compile Include="MyTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Shelter.cs" />
     <EmbeddedResource Include="ProjectionForm.resx">
       <DependentUpon>ProjectionForm.cs</DependentUpon>
     </EmbeddedResource>
