@@ -14,6 +14,8 @@ namespace InvestmentOptions {
         public List<LeafNode> nodeList;
         List<Chart> charts = new List<Chart>();
         public ProjectionForm form;
+        public FlowLayoutPanel optionsPanel;
+        //public delegate void PropertyChangedEventHandler();
 
         public ProjectionPanel(InvestmentOption option, ProjectionForm form) {
             this.form = form;
@@ -26,11 +28,6 @@ namespace InvestmentOptions {
             BorderStyle = BorderStyle.FixedSingle;
         }
 
-        public void updateSelf() {
-            updateCharts();
-            updateDetails();
-        }
-
         public void initialiseChildren() {
             //INSTANTIATE CHARTS
             charts.Add(new Chart());
@@ -38,19 +35,22 @@ namespace InvestmentOptions {
             charts.Add(new Chart());
             charts.Add(new Chart());
             //SETUP OPTIONS
-            initialiseOptions();
+            initialiseOptionsPanel();
             //SETUP CHARTS
             initialiseChart(charts[0]);
-            //charts[0].ChartAreas[0].AxisY.Maximum = 100000;
+            charts[0].ChartAreas[0].AxisY.Maximum = 140000;
             //title1.DockedToChartArea = chart1.ChartAreas[0].Name;
             initialiseChart(charts[1]);
-            //charts[1].ChartAreas[0].AxisY.Maximum = 2000;
+            charts[1].ChartAreas[0].AxisY.Maximum = 2000;
             //chart2.Titles[0].DockedToChartArea = chart2.ChartAreas[0].Name;
             initialiseChart(charts[2]);
-            //charts[2].ChartAreas[0].AxisY.Maximum = 2000;
+            charts[2].ChartAreas[0].AxisY.Maximum = 2000;
             initialiseChart(charts[3]);
             charts[3].ChartAreas[0].AxisY.Maximum = 10;
-            charts[3].ChartAreas[0].AxisY.Minimum = -10;
+            charts[3].ChartAreas[0].AxisY.Minimum = -4;
+            foreach (Chart chart in charts) {
+                //chart.Dock = DockStyle.Fill;
+            }
         }
 
         public void initialiseChart(Chart chart) {
@@ -65,24 +65,29 @@ namespace InvestmentOptions {
             chart.Legends.Add(legend);
         }
 
-        public void initialiseOptions() {
-            CheckBox rentARoomSchemeCheckBox = new CheckBox(); 
-            Controls.Add(rentARoomSchemeCheckBox);
-            rentARoomSchemeCheckBox.Name = "rentARoomScheme";
-            rentARoomSchemeCheckBox.Text = rentARoomSchemeCheckBox.Name;
-            Binding binding = new Binding("Checked", option.realWorldTree.property, "rentARoomScheme");
-            //of course! A property, is NOT a field. It is the get/setter for the field!
-            //the properties name should NEVER change, after release, so ok to use a string!
+        public void initialiseOptionsPanel() {
+            optionsPanel = new FlowLayoutPanel();
+            optionsPanel.BorderStyle = BorderStyle.FixedSingle;
+            optionsPanel.FlowDirection = FlowDirection.LeftToRight;
+            optionsPanel.Dock = DockStyle.Top;
+            optionsPanel.Height = 60;
+            Controls.Add(optionsPanel);
+            addCheckBox(option.realWorldTree.property.rentARoomScheme);
+            addCheckBox(option.countRentSavingsAsIncome);
+            addCheckBox(option.autoInvest);
+        }
+
+        public void addCheckBox(Object dataSource) { //data member is the property, to bind.
+            MyBoolean myBoolean = (MyBoolean)dataSource;
+            CheckBox checkBox = new CheckBox();
+            optionsPanel.Controls.Add(checkBox);
+            checkBox.Name = myBoolean.name;
+            checkBox.Text = checkBox.Name;
+            Binding binding = new Binding("Checked", dataSource, "value");
             binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
-            rentARoomSchemeCheckBox.DataBindings.Add(binding);
-            //COUNT SAVINGS AS INCOME
-            CheckBox countSavingsAsIncome = new CheckBox();
-            Controls.Add(countSavingsAsIncome);
-            countSavingsAsIncome.Name = "countRentSavingsAsIncome";
-            countSavingsAsIncome.Text = countSavingsAsIncome.Name;
-            Binding binding2 = new Binding("Checked", option, "countRentSavingsAsIncome");
-            binding2.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
-            countSavingsAsIncome.DataBindings.Add(binding2);
+            checkBox.DataBindings.Add(binding);
+            //SUBSCRIBE TO ITS EVENTS
+            myBoolean.PropertyChanged += new PropertyChangedEventHandler(handlePropertyChanged);
         }
 
         public void addCheckedSeriesToCharts(TreeNodeCollection nodes) {
@@ -107,6 +112,10 @@ namespace InvestmentOptions {
             }
         }
 
+        public void handlePropertyChanged(Object sender, EventArgs args) {
+            updateSelf();
+        }
+
         public void removeAllSeriesFromCharts() {
             for (int chart = 0; chart < charts.Count; chart++) {
                 charts[chart].Series.Clear();
@@ -121,12 +130,20 @@ namespace InvestmentOptions {
 
         public void updateCharts() {
             option.makeProjection(this);
-            MyTreeView realWorldTree = option.realWorldTree;
             removeAllSeriesFromCharts();
-            addCheckedSeriesToCharts(realWorldTree.Nodes);
+            addCheckedSeriesToCharts(option.realWorldTree.Nodes);
+            //ITS OK! if refering to dataTree, just put in Option one here... ALL is fine!!!
+            //THIS treeView, is only needed for the VIEW!!!
+            //Thanks to GETNodePath method, all is ok... or is it? Path might differ slightly...
+            //Mod it??? (Probs not now... Just do PROPERTY RESEARCH!!!)
             //THIS WAS A MESS!
             //Basically, whenever makeProjection is called,
             //as a result, all projections, and and series, should be reset, and then updated.
+        }
+
+        public void updateSelf() {
+            updateCharts();
+            updateDetails();
         }
 
     }

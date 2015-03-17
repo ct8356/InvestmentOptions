@@ -5,22 +5,21 @@ using System.Text;
 
 namespace InvestmentOptions {
     public class Shelter : BranchNode {
-        public InvestmentOption option;
         public LeafNode outgoings;
         public LeafNode rent;
         public LeafNode houseCosts;
         public LeafNode houseBills;
         public LeafNode councilTax;
 
-        public Shelter(InvestmentOption option) : base("shelter", option) {
-            this.option = option;
-            Nodes.Add(outgoings = new LeafNode("outgoings", option));
-            Nodes.Add(rent = new LeafNode("rentN", option));
-            Nodes.Add(houseCosts = new LeafNode("houseCosts", option));
-            Nodes.Add(houseBills = new LeafNode("houseBills", option));
-            Nodes.Add(councilTax = new LeafNode("councilTax", option));
+        public Shelter(InvestmentOption option) : base("shelter") {
+            Nodes.Add(outgoings = new LeafNode("outgoings"));
+            Nodes.Add(rent = new LeafNode("rentN"));
+            Nodes.Add(houseCosts = new LeafNode("houseCosts"));
+            Nodes.Add(houseBills = new LeafNode("houseBills"));
+            Nodes.Add(councilTax = new LeafNode("councilTax"));
             houseBills.mv = 45;
             councilTax.mv = 100;
+            this.option = option;
         }
 
         public void resetVariables() {
@@ -29,7 +28,7 @@ namespace InvestmentOptions {
             }
             else if (option.realWorldTree.property.buyType == Property.BuyType.toLiveIn) {
                 rent.mv = 0;
-                if (option.countRentSavingsAsIncome)
+                if (option.countRentSavingsAsIncome.value)
                     rent.mv = 330;
             }
             //RESET REST

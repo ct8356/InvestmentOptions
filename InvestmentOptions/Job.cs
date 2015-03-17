@@ -9,11 +9,12 @@ namespace InvestmentOptions {
         public LeafNode studentLoanRepayments;
         public LeafNode income;
 
-        public Job(InvestmentOption option): base("job", option) {
-            Nodes.Add(ingoings = new LeafNode("ingoings", option));
-            Nodes.Add(studentLoanRepayments = new LeafNode("studentLoanRepayments", option));
-            Nodes.Add(income = new LeafNode("jobIncome", option));
+        public Job(InvestmentOption option): base("job") {
+            Nodes.Add(ingoings = new LeafNode("ingoings"));
+            Nodes.Add(studentLoanRepayments = new LeafNode("studentLoanRepayments"));
+            Nodes.Add(income = new LeafNode("jobIncome"));
             income.mv = 1500;
+            this.option = option;
         }
 
         public void calculateStudentLoanPayment() {

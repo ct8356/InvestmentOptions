@@ -99,15 +99,20 @@ namespace InvestmentOptions {
         }
 
         public void addChildren() {
+            //Nodes.AddRange(option.Nodes);
             Nodes.Add(job = new Job(option));
             Nodes.Add(life = new Life(option));
             Nodes.Add(mortgage = new Mortgage(option));
             Nodes.Add(property = new Property(option));
             Nodes.Add(shelter = new Shelter(option));
-            Nodes.Add(bankAccount = new LeafNode("bankAccount", option));
-            Nodes.Add(netWorth = new LeafNode("netWorth", option));
-            Nodes.Add(ingoings = new LeafNode("ingoings", option));
-            Nodes.Add(outgoings = new LeafNode("outgoings", option));
+            Nodes.Add(bankAccount = new LeafNode("bankAccount"));
+            Nodes.Add(netWorth = new LeafNode("netWorth"));
+            Nodes.Add(ingoings = new LeafNode("ingoings"));
+            Nodes.Add(outgoings = new LeafNode("outgoings"));
+            //NOTE: could add these children to investmentOption, THEN add them here!!!
+            //BETTER!
+            //Only issue is, WOULD I have to bind them together???
+            //DO I call anything, here?
         }
 
         public void addBindings(TreeNodeCollection nodes) {
@@ -182,11 +187,11 @@ namespace InvestmentOptions {
         public void resetTree(TreeNodeCollection nodes) {
             foreach (MyTreeNode node in nodes) {
                 if (node is LeafNode) {
-                    LeafNode leafNode = (LeafNode) node;
+                    LeafNode leafNode = (LeafNode)node;
                     leafNode.series.Points.Clear();
-                    for (int interval = 0; interval < node.intervals; interval++) {
-                        leafNode.projection[interval] = 0;
-                    }
+                    //for (int interval = 0; interval < node.intervals; interval++) {
+                    //    leafNode.projection[interval] = 0;
+                    //}
                 }
                 resetTree(node.Nodes);
             }
@@ -209,15 +214,21 @@ namespace InvestmentOptions {
             property.accountantsFee.showInChartList[2] = true;
             property.returnOnInvestment.showInChartList[3] = true;
             property.tenantCount.showInChartList[3] = true;
+            property.capitalGains.showInChartList[0] = true;
         }
 
         public void updateSeries(TreeNodeCollection nodes) {
             foreach (MyTreeNode node in nodes) {
                 if (node is LeafNode) {
                     LeafNode leafNode = (LeafNode) node;
-                    //node.series.Points.Clear();
-                    leafNode.series.Points.AddY(leafNode.mv);
-                    leafNode.series.LegendText = leafNode.series.Name + leafNode.mv;
+                    if (leafNode.showCumulative) {
+                        leafNode.series.Points.AddY(leafNode.cumulativeValue);
+                        leafNode.series.LegendText = leafNode.series.Name + leafNode.cumulativeValue;
+                    }
+                    else {
+                        leafNode.series.Points.AddY(leafNode.mv);
+                        leafNode.series.LegendText = leafNode.series.Name + leafNode.mv;
+                    }
                 }
                 updateSeries(node.Nodes);
             }

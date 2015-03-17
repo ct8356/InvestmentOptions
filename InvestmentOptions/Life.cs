@@ -32,9 +32,10 @@ namespace InvestmentOptions {
         //I will just have to put up with it for today...
         //it is a small cost...
 
-        public Life(InvestmentOption option) : base("life", option) {
-            Nodes.Add(outgoings = new LeafNode("lifeOutgoings", option));
-            Nodes.Add(costs = new LeafNode("lifecosts", option));
+        public Life(InvestmentOption option) : base("life") {
+            Nodes.Add(outgoings = new LeafNode("lifeOutgoings"));
+            Nodes.Add(costs = new LeafNode("lifecosts"));
+            this.option = option;
         }
 
         //public float sum {

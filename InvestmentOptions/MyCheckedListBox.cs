@@ -12,13 +12,11 @@ namespace InvestmentOptions {
 
         public MyCheckedListBox(ProjectionForm form) {
             this.form = form;
-            //This is a real mess. Let us not use this again...
-            //Let us just have objects, that have properties, like show, or not.
-            //Let us put them in lists...
-            //Let us find a way of showing them, perhaps in a listView, or just a form,
-            //which can hold check boxes etc.
-            //Just like you did in Android.
-            //Much more flexible that way...
+            Dock = DockStyle.Fill;
+            //Width = Parent.Width;
+            //Height = 150;
+            //BorderStyle = BorderStyle.FixedSingle; //does funny things...
+            //Margin = new Padding(0);
         }
 
         protected override void OnItemCheck(ItemCheckEventArgs checkEvent) {

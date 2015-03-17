@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace InvestmentOptions {
     public class MyTreeNode : TreeNode {
 
-        public int intervals;
+        //public int intervals;
         public string label { get; set; }
         //public new string Text {
         //    get { return label; }
@@ -19,9 +19,9 @@ namespace InvestmentOptions {
             Text = Name;
         }
 
-        public MyTreeNode(String name, InvestmentOption option) {
+        public MyTreeNode(String name) {
             Text = name;
-            intervals = option.intervals;
+            //intervals = option.intervals;
         }
     }
 }

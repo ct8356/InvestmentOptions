@@ -13,7 +13,7 @@ namespace InvestmentOptions {
         public OptionDictator() {
             form = new ProjectionForm();
             createOptionCombination();
-            form.setupTheRest(options);
+            form.BindFormToOptions(options);
             //better, because can change it easily, just by calling a different method...
             Application.Run(form);
             //seems like it does not continue with the rest of code until this is closed..

@@ -14,16 +14,16 @@ namespace InvestmentOptions {
         private IContainer components = null;
         public ControlPanel controlPanel;
         public TableLayoutPanel tablePanel = new TableLayoutPanel();
-        private float controlPanelWidth = 15;
+        private float controlPanelWidth = 17;
         public List<InvestmentOption> optionsList;
         public List<ProjectionPanel> panelList;
 
         public ProjectionForm() {
-            ClientSize = new Size(700, 600);
+            //ClientSize = new Size(700, 600);
             WindowState = FormWindowState.Maximized;
             Text = "Christiaan Form";
             tablePanel.Dock = DockStyle.Fill;
-            tablePanel.RowCount = 0;
+            //tablePanel.RowCount = 0; //Won't do nothing.. it is just a tracker, for your use...
             //CONTROL PANEL
             tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, controlPanelWidth));
             controlPanel = new ControlPanel(this);
@@ -42,13 +42,20 @@ namespace InvestmentOptions {
             //Could fight it with a if statement...       
         }
 
-        public void setupTheRest(List<InvestmentOption> optionsList) {
+        public void BindFormToOptions(List<InvestmentOption> optionsList) {
             this.optionsList = optionsList;
             controlPanel.listBox.Items.AddRange(optionsList.ToArray());
             addPanels();
             controlPanel.listBox.SetItemChecked(0, true);
             //controlPanel.listBox.SetItemChecked(2, true);
+            //NOTE: THIS IS VERY IMPORTANT.
+            //MUST create form first, because it sets tree structure for the options...
+            //Then must create options, before can bind the form to the options!!!
+            //ACTUALLY, should make OPTIONS first... They will all have identical structure...
+            //Create Data first, THEN decide how to display it... CBTL
+            //I like this plan. think more tomorrow...
         }
+
         
         public void addPanels() {
             //int checkedItemsCount = controlPanel.listBox.CheckedItems.Count;//lets not use. Unreliable.

@@ -22,19 +22,19 @@ namespace InvestmentOptions {
         //try 487 for 6% annual.
         public LeafNode payment;
 
-        public Mortgage(InvestmentOption option) : base("mortgage", option) {
+        public Mortgage(InvestmentOption option) : base("mortgage") {
+            Nodes.Add(repayment = new LeafNode("mortgageRepayment"));
+            Nodes.Add(interest = new LeafNode("mortgageinterest"));
+            Nodes.Add(payment = new LeafNode("mortgagePayment"));
+            Nodes.Add(debtReduced = new LeafNode("debtReduced"));
             this.option = option;
-            Nodes.Add(repayment = new LeafNode("mortgageRepayment", option));
-            Nodes.Add(interest = new LeafNode("mortgageinterest", option));
-            Nodes.Add(payment = new LeafNode("mortgagePayment", option));
-            Nodes.Add(debtReduced = new LeafNode("debtReduced", option));
         } //YOU KNOW WHAT? I just realised, that don't actually need to give
         //references to these objects.
         //Because strictly, they would be created by user.
         //WOuld anonymous... Only would have Strings for names...
         //Only a rigid program, would have references...
 
-        public void calculateMortgagePayments(int interval) {
+        public void calculateMortgagePayments(int intervals) {
             switch (type) {
                 case Mortgage.BuyType.repayment: //repaymentMortgage.
                     payment.mv = moneyBorrowed * interestRate *

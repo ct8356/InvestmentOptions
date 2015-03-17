@@ -13,20 +13,10 @@ namespace InvestmentOptions {
         public float price;
         public enum BuyType { toLiveIn, toLet }; //buyToLive or buyToLet
         public BuyType buyType;
-        private bool _rentARoomScheme = false;
-        public bool rentARoomScheme {
-            get {
-                return _rentARoomScheme;
-            }
-            set {
-                _rentARoomScheme = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("RentARoomScheme"));
-                //note, name the set method,
-                //not the field. In c#, call these methods "properties".
-                option.projectionPanel.updateSelf();
-                //use form or panel, to try and just update the panel?
-            }
-        }
+        public enum Location { Nottingham, London };
+        public Location location = Location.Nottingham;
+        public MyBoolean rentARoomScheme = new MyBoolean("rentARoomScheme");
+        public MyBoolean includeWearAndTear = new MyBoolean("includeWearAndTear");
         public LeafNode incomeTax;
         public LeafNode ingoings;
         public LeafNode outgoings;
@@ -55,22 +45,28 @@ namespace InvestmentOptions {
         public LeafNode returnOnInvestment;
         public LeafNode costs;
         public LeafNode taxableTenantsRent;
+        public LeafNode capitalGains;
+        public LeafNode capitalGainsTax;
+        public float percentageGrowth;
 
-        public Property(InvestmentOption option) : base("property", option){
+        public Property(InvestmentOption option) : base("property") {
+            Nodes.Add(ingoings = new LeafNode("propertyingoings"));
+            Nodes.Add(tenantCount = new LeafNode("tenantCount"));
+            Nodes.Add(tenantsRent = new LeafNode("tenantsRent"));
+            Nodes.Add(taxableTenantsRent = new LeafNode("taxableTenantsRent"));
+            Nodes.Add(outgoings = new LeafNode("propertyoutgoings"));
+            Nodes.Add(costs = new LeafNode("propertycosts"));
+            Nodes.Add(wearAndTear = new LeafNode("wearAndTear"));
+            Nodes.Add(agentsFee = new LeafNode("agentsFee"));
+            Nodes.Add(accountantsFee = new LeafNode("accountantsFee"));
+            Nodes.Add(profit = new LeafNode("propertyProfit"));
+            Nodes.Add(taxableProfit = new LeafNode("taxableProfit"));
+            Nodes.Add(incomeTax = new LeafNode("incomeTax")); //BOOM,instant'g and assign'g same time!
+            Nodes.Add(returnOnInvestment = new LeafNode("returnOnInvestment"));
+            Nodes.Add(capitalGains = new LeafNode("capitalGains"));
+            Nodes.Add(capitalGainsTax = new LeafNode("capitalGainsTax"));
+            capitalGains.showCumulative = true;
             this.option = option;
-            Nodes.Add(ingoings = new LeafNode("propertyingoings", option));
-            Nodes.Add(tenantCount = new LeafNode("tenantCount", option));
-            Nodes.Add(tenantsRent = new LeafNode("tenantsRent", option));
-            Nodes.Add(taxableTenantsRent = new LeafNode("taxableTenantsRent", option));
-            Nodes.Add(outgoings = new LeafNode("propertyoutgoings", option));
-            Nodes.Add(costs = new LeafNode("propertycosts", option));
-            Nodes.Add(wearAndTear = new LeafNode("wearAndTear", option));
-            Nodes.Add(agentsFee = new LeafNode("agentsFee", option));
-            Nodes.Add(accountantsFee = new LeafNode("accountantsFee", option));
-            Nodes.Add(profit = new LeafNode("propertyProfit", option));
-            Nodes.Add(taxableProfit = new LeafNode("taxableProfit", option));
-            Nodes.Add(incomeTax = new LeafNode("incomeTax", option)); //BOOM,instant'g and assign'g same time!
-            Nodes.Add(returnOnInvestment = new LeafNode("returnOnInvestment", option));
         }
 
         public void buyNewProperty() {
@@ -85,6 +81,20 @@ namespace InvestmentOptions {
                 option.realWorldTree.mortgage.repayment.mv;
         }
 
+        public void calculateCapitalGainsTax() {
+            switch (location) {
+                case Location.Nottingham:
+                    percentageGrowth = 0.03f / 12; //not bad guess... needs to change based on enum LOCATION.
+                    break;
+                case Location.London:
+                    percentageGrowth = 0.05f / 12; 
+                    break;
+            }
+            capitalGains.mv = propertyCount * option.realWorldTree.mortgage.housePrice * percentageGrowth;
+            capitalGains.cumulativeValue += capitalGains.mv;
+            capitalGainsTax.mv = capitalGains.mv * 0.20f / 12;
+        }
+
         public void calculatePropertyIncomeTax() {
             taxableTenantsRent.mv = tenantsRent.mv;
             calculatePropertyOutgoings();
@@ -92,7 +102,7 @@ namespace InvestmentOptions {
                 (outgoings.mv - option.realWorldTree.mortgage.repayment.mv);
             switch (buyType) {
                 case Property.BuyType.toLiveIn: //Buy to live in
-                    if (rentARoomScheme) {
+                    if (rentARoomScheme.value) {
                         taxableTenantsRent.mv = tenantsRent.mv - 4250 / 12;
                         if (taxableTenantsRent.mv < 0)
                             taxableTenantsRent.mv = 0;
@@ -112,6 +122,10 @@ namespace InvestmentOptions {
             if (option.zeroInvestment) {
                 profit.mv = option.realWorldTree.mortgage.repayment.cumulativeValue * option.realWorldTree.mortgage.interestRate; 
             }
+        }
+
+        public void resetCumulativeValues() {
+            capitalGains.cumulativeValue = 0;
         }
 
         public void resetVariables() {
@@ -135,6 +149,7 @@ namespace InvestmentOptions {
                 moneyInvested = 0;
             }
             updateMultiples();
+            resetCumulativeValues();
         } //Could call this with an event, OR just call it in upper method...
         //Note, event might be easier, because just define the reaction in BASE class,
         //then every object created, will update itself automatically!!! //CBTL
@@ -144,13 +159,28 @@ namespace InvestmentOptions {
             if (option.zeroInvestment) {
                 tenantsRent.mv = 0;
             }
-            agentsFee.mv = tenantsRent.mv * 0.15f;
-            if (option.countRentSavingsAsIncome) {
+            agentsFee.mv = 0;
+            if (includeWearAndTear.value)
+                agentsFee.mv = tenantsRent.mv * 0.15f;
+            if (option.countRentSavingsAsIncome.value) {
                 tenantsRent.mv = (tenantCount.mv + 1) * oneTenantsRent; //extra one, for the saving...
             }//comes after agents Fee, because ME won't need an agentsFee...
-            wearAndTear.mv = propertyCount * 90; //now, that's fairer...
+            wearAndTear.mv = propertyCount * 0;
+            if (includeWearAndTear.value)
+                wearAndTear.mv = propertyCount * 90; //now, that's fairer.
             buildingsInsurance = propertyCount * 12;
             accountantsFee.mv = propertyCount * 9; //numbers are the costs
+        }
+
+        public void updateVariables() {
+            calculatePropertyIncomeTax();
+            costs.mv = outgoings.mv - option.realWorldTree.mortgage.repayment.mv;
+            if (option.zeroInvestment) {
+                costs.mv = 0;
+            }
+            moneyInvested += option.realWorldTree.mortgage.repayment.mv;
+            returnOnInvestment.mv = 12 * profit.mv / moneyInvested * 100;
+            calculateCapitalGainsTax();
         }
 
     }

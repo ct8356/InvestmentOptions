@@ -13,10 +13,10 @@ namespace InvestmentOptions {
         //NOTE: Could make this a generic class, to hold floats, and bools...
         public String Name;
         public bool boolean;
+        public bool showCumulative = false;
         public List<bool> showInChartList = new List<bool>();
         public float mv;
-        public float cumulativeValue = 0;
-        public float[] projection;
+        public float cumulativeValue; //NOTE, not enough to set it to zero here.... Do it in RESET!
         public Series series;
         //List<Node> children; //Not needed now...
 
@@ -24,8 +24,7 @@ namespace InvestmentOptions {
             //Do nothing
         }
 
-        public LeafNode(String name, InvestmentOption option) : base(name, option) {
-            projection = new float[option.intervals];
+        public LeafNode(String name) : base(name) {
             series = new Series();
             Name = name;
             series.Name = name;

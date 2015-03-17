@@ -51,9 +51,13 @@
     <Compile Include="ControlPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GlobalParameters.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Job.cs" />
     <Compile Include="Life.cs" />
     <Compile Include="Mortgage.cs" />
+    <Compile Include="MyBoolean.cs" />
     <Compile Include="MyCheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>

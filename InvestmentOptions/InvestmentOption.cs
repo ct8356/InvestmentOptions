@@ -8,29 +8,29 @@ using System.Threading;
 
 namespace InvestmentOptions {
 
-    public class InvestmentOption : INotifyPropertyChanged {
+    public class InvestmentOption : BranchNode {
         public event PropertyChangedEventHandler PropertyChanged;
         //NEED TO SHRINK THIS FILE!
         //NEEDS TIDYING UP OF FIELDS! CBTL
         public ProjectionForm form;
         public ProjectionPanel projectionPanel;
+        ////TREENODES
+        //public Job job;
+        //public Life life;
+        //public Mortgage mortgage;
+        //public Property property;
+        //public Shelter shelter;
+        ////OTHER NODES (WITH SERIES)
+        //public LeafNode bankAccount;
+        //public LeafNode netWorth;
+        //public LeafNode ingoings;
+        //public LeafNode outgoings;
         public bool showInPanel = false;
         public bool zeroInvestment = false;
         public bool noMortgageNeeded = false;
-        private bool _countRentSavingsAsIncome = false;
-        public bool countRentSavingsAsIncome {
-            get {
-                return _countRentSavingsAsIncome;
-            }
-            set {
-                _countRentSavingsAsIncome = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("countRentSavingsAsIncome")); 
-                //note, name the set method,
-                //not the field. In c#, call these methods "properties".
-                projectionPanel.updateSelf();
-                //use form or panel, to try and just update the panel?
-            }
-        }
+        public MyBoolean countRentSavingsAsIncome = new MyBoolean("countRentSavingsAsIncome");
+        public MyBoolean autoInvest = new MyBoolean("autoInvest");
+        //NOTE: must be a better way of doing this... Not sure I even like Bindings. Not much simpler...
         public String Name;
         public int years = 10;
         public int intervals; //(interval is one month)...
@@ -50,16 +50,14 @@ namespace InvestmentOptions {
         //interesting alternative to above, might be one class, with a load of nested-classes...
         //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
 
-        public InvestmentOption() {
+        public InvestmentOption() : base("option") {
             initialiseVariables();
             //From now on, initialise specifically means, has to be done at start of program!
             //Reset means, has to be done at start of some other internal process...
             //Or a bind to tree method, OR use the tree itself as main variables.
             //OR bind the tree to these variables, OR any of above, just try one, then will see strngths and wknss.
             //initialiseTree(); //BIZARRELY! if call this, won;t show up in other tree!
-            //initialiseKeyList();
-            //initialiseNodeDictionary();
-            //initialiseNodeList();
+            //addChildren();
         }
 
         public InvestmentOption(ProjectionForm form) : this() {
@@ -67,6 +65,23 @@ namespace InvestmentOptions {
             //treeView = new MyTreeView(form.controlPanel, this);
             realWorldTree = new MyTreeView(form.controlPanel, this);
         }
+
+        //public void addChildren() {
+        //    //Nodes.Add(option.Nodes);
+        //    Nodes.Add(job = new Job());
+        //    Nodes.Add(life = new Life());
+        //    Nodes.Add(mortgage = new Mortgage());
+        //    Nodes.Add(property = new Property());
+        //    Nodes.Add(shelter = new Shelter());
+        //    Nodes.Add(bankAccount = new LeafNode("bankAccount"));
+        //    Nodes.Add(netWorth = new LeafNode("netWorth"));
+        //    Nodes.Add(ingoings = new LeafNode("ingoings"));
+        //    Nodes.Add(outgoings = new LeafNode("outgoings"));
+        //    //NOTE: could add these children to investmentOption, THEN add them here!!!
+        //    //BETTER!
+        //    //Only issue is, WOULD I have to bind them together???
+        //    //DO I call anything, here?
+        //}
 
         //public void initialiseTree() {
         //    //bizarrely, if call  this, won't show up in realWorldTree!!!
@@ -88,7 +103,7 @@ namespace InvestmentOptions {
         //    treeView.Nodes.Add(realWorldTree.mortgage.payment);
         //}
 
-        public void autoInvest() {
+        public void invest() {
             if (realWorldTree.bankAccount.mv > realWorldTree.mortgage.deposit) {
                 //invest
                 realWorldTree.mortgage.moneyBorrowed += realWorldTree.property.price - realWorldTree.mortgage.deposit; // not that important.
@@ -117,21 +132,21 @@ namespace InvestmentOptions {
             realWorldTree.property.accountantsFee.cumulativeValue += realWorldTree.property.accountantsFee.mv;
             realWorldTree.property.incomeTax.cumulativeValue += realWorldTree.property.incomeTax.mv;
             realWorldTree.job.studentLoanRepayments.cumulativeValue += realWorldTree.job.studentLoanRepayments.mv;
+            //realWorldTree.property.capitalGains.cumulativeValue += realWorldTree.job.student
         }//Note, this can easily be done in own nodes... easier with events? or method waterfall?
         //either way, the method needs to be called by something... (by the delegate, or by the upper method).
         //NOTE: I might suggest, avoid using events unless really have to? i.e. registering with event of unmodifiable class?
         //AHAH! real question is, is it easier for you, to define the link in object, or in the parent???
+        //WHATEVER! NEED to do something about this!!!
 
         public void calculateIngoings() {
             //just have to make sure all equations are well defined here...
-            bankInterest = realWorldTree.bankAccount.mv * bankInterestRate; //Monthly interest...
-            realWorldTree.property.calculatePropertyIncomeTax();
+            bankInterest = realWorldTree.bankAccount.mv * bankInterestRate; //Monthly interest...     
             realWorldTree.ingoings.mv = realWorldTree.job.ingoings.mv + bankInterest + realWorldTree.property.tenantsRent.mv -
                 realWorldTree.property.incomeTax.mv;
         }
 
         public void calculateOutgoings() {
-            realWorldTree.property.calculatePropertyIncomeTax();
             realWorldTree.shelter.houseCosts.mv = realWorldTree.shelter.rent.mv + realWorldTree.shelter.houseBills.mv + realWorldTree.shelter.councilTax.mv;
             realWorldTree.outgoings.mv = realWorldTree.shelter.houseCosts.mv + realWorldTree.life.costs.mv + realWorldTree.property.outgoings.mv;
         }
@@ -183,29 +198,21 @@ namespace InvestmentOptions {
                 //With events, register the delegate/method with the event.... and write a method...
                 //Both are fairly similar...
                 //FOR NOW, don't change anything... I don't see a massive improvement in clarity...
-                realWorldTree.mortgage.calculateMortgagePayments(interval);
+                realWorldTree.mortgage.calculateMortgagePayments(intervals);
+                realWorldTree.property.updateVariables();
                 calculateIngoings();
                 calculateOutgoings();
                 realWorldTree.bankAccount.mv += realWorldTree.ingoings.mv - realWorldTree.outgoings.mv;
                 realWorldTree.netWorth.mv += realWorldTree.ingoings.mv - realWorldTree.outgoings.mv +
                     realWorldTree.mortgage.repayment.mv;
-
-                realWorldTree.property.costs.mv = realWorldTree.property.outgoings.mv - realWorldTree.mortgage.repayment.mv;
-                if (zeroInvestment) {
-                    realWorldTree.property.costs.mv = 0;
-                }
-                realWorldTree.property.moneyInvested += realWorldTree.mortgage.repayment.mv;
-                realWorldTree.property.returnOnInvestment.mv = 12 * realWorldTree.property.profit.mv / realWorldTree.property.moneyInvested * 100;
-                //CBTL error, when divide by zero?
-                //STORE IN ARRAYS:
                 //STORE TOTALS:
                 calculateCumulativeValues();
                 //UPDATE SERIES OF ALL NODES IN THE TREE!
                 //I SUGGEST, next BIG task, should be, put these in OWN places... //CBTL
                 realWorldTree.updateSeries(realWorldTree.Nodes);
                 //STRANGELY, above is not getting called when I click a checkBox... should... 
-                if (realWorldTree.mortgage.type == Mortgage.BuyType.interestOnly && false) 
-                    autoInvest();
+                if (realWorldTree.mortgage.type == Mortgage.BuyType.interestOnly && autoInvest.value) 
+                    invest();
             }
             //treeView.labelTree(treeView.Nodes);
         }
@@ -228,7 +235,7 @@ namespace InvestmentOptions {
             realWorldTree.shelter.resetVariables();
             //Option specific stuff:
             realWorldTree.bankAccount.mv = 0;
-            realWorldTree.netWorth.mv = realWorldTree.bankAccount.mv;
+            realWorldTree.netWorth.mv = realWorldTree.bankAccount.mv + realWorldTree.property.propertyCount * realWorldTree.mortgage.deposit;
         }
 
         public override String ToString() {
