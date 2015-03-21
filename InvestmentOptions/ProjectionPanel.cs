@@ -26,6 +26,11 @@ namespace InvestmentOptions {
             this.option = option;
             initialiseChildren();
             BorderStyle = BorderStyle.FixedSingle;
+            //SUBCRIBE TO EVENTS (of the static booleans).
+            InvestmentOption.countRentSavingsAsIncome.PropertyChanged += 
+                new PropertyChangedEventHandler(handlePropertyChanged);
+            Property.includeWearAndTear.PropertyChanged += 
+                new PropertyChangedEventHandler(handlePropertyChanged);
         }
 
         public void initialiseChildren() {
@@ -73,8 +78,9 @@ namespace InvestmentOptions {
             optionsPanel.Height = 60;
             Controls.Add(optionsPanel);
             addCheckBox(option.realWorldTree.property.rentARoomScheme);
-            addCheckBox(option.countRentSavingsAsIncome);
             addCheckBox(option.autoInvest);
+            addLabel(option.realWorldTree.property.buyType.ToString());
+            addLabel(option.realWorldTree.mortgage.type.ToString());
         }
 
         public void addCheckBox(Object dataSource) { //data member is the property, to bind.
@@ -110,6 +116,13 @@ namespace InvestmentOptions {
                 }
                 addCheckedSeriesToCharts(node.Nodes);
             }
+        }
+
+        public void addLabel(String dataSource) {
+            Label label = new Label();
+            optionsPanel.Controls.Add(label);
+            label.Name = dataSource;
+            label.Text = label.Name;
         }
 
         public void handlePropertyChanged(Object sender, EventArgs args) {

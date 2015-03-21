@@ -42,7 +42,8 @@ namespace InvestmentOptions {
             NodeMouseClick += new TreeNodeMouseClickEventHandler(updateShowInChartList);
         }
 
-        public MyTreeView(ControlPanel controlPanel, InvestmentOption option) : this(option) {
+        public MyTreeView(ControlPanel controlPanel, InvestmentOption option)
+            : this(option) {
             //THIS is for OPTION Trees!!!
             this.controlPanel = controlPanel;
             controlPanel.realWorldTreeView.NodeMouseClick += new TreeNodeMouseClickEventHandler(updateShowInChartList);
@@ -52,6 +53,9 @@ namespace InvestmentOptions {
             //should be bound to the MAIN UI tree...
             //NOTE: THe below needs to go in a recursion method!!! Creating LOAD of bindings!!!
             //addBindings(Nodes);
+            //NOTE: the BINDINGS, go in the CONTROL PANEL, when it is made!!!
+            //OK!, should be bindings, but opens up a can of worms... (need to make INVOPTION the root node!).
+            //You will just have to have a BINDING method in ProjForm, for now...
         }
 
         public void drawCheckBoxes(MyTreeNode node, DrawTreeNodeEventArgs e) {
@@ -262,8 +266,6 @@ namespace InvestmentOptions {
                 Invalidate();
             }
         }
-
-
 
     }
 }

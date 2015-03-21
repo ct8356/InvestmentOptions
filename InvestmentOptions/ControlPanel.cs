@@ -18,7 +18,7 @@ namespace InvestmentOptions {
             this.form = form;
             //CHILDREN
             globalParameters = new GlobalParameters(form);
-            InvestmentOption dudOption = new InvestmentOption(); //this is the DUD constructor.
+            InvestmentOption dudOption = new InvestmentOption("dud"); //this is the DUD constructor.
             realWorldTreeView = new MyTreeView(dudOption); //needs to be like this,
             realWorldTreeView.setDefaultNodeToChartMapping();
             //since atm, RWT made inside the option.

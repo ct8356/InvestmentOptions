@@ -28,7 +28,8 @@ namespace InvestmentOptions {
         public bool showInPanel = false;
         public bool zeroInvestment = false;
         public bool noMortgageNeeded = false;
-        public MyBoolean countRentSavingsAsIncome = new MyBoolean("countRentSavingsAsIncome");
+        public List<MyBoolean> booleans;
+        public static MyBoolean countRentSavingsAsIncome = new MyBoolean("countRentSavingsAsIncome");
         public MyBoolean autoInvest = new MyBoolean("autoInvest");
         //NOTE: must be a better way of doing this... Not sure I even like Bindings. Not much simpler...
         public String Name;
@@ -50,7 +51,8 @@ namespace InvestmentOptions {
         //interesting alternative to above, might be one class, with a load of nested-classes...
         //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
 
-        public InvestmentOption() : base("option") {
+        public InvestmentOption(String name) : base(name) {
+            this.Name = name;
             initialiseVariables();
             //From now on, initialise specifically means, has to be done at start of program!
             //Reset means, has to be done at start of some other internal process...
@@ -60,7 +62,7 @@ namespace InvestmentOptions {
             //addChildren();
         }
 
-        public InvestmentOption(ProjectionForm form) : this() {
+        public InvestmentOption(String name, ProjectionForm form) : this(name) {
             this.form = form;
             //treeView = new MyTreeView(form.controlPanel, this);
             realWorldTree = new MyTreeView(form.controlPanel, this);

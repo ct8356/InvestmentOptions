@@ -16,7 +16,7 @@ namespace InvestmentOptions {
         public enum Location { Nottingham, London };
         public Location location = Location.Nottingham;
         public MyBoolean rentARoomScheme = new MyBoolean("rentARoomScheme");
-        public MyBoolean includeWearAndTear = new MyBoolean("includeWearAndTear");
+        public static MyBoolean includeWearAndTear = new MyBoolean("includeWearAndTear");
         public LeafNode incomeTax;
         public LeafNode ingoings;
         public LeafNode outgoings;
@@ -66,7 +66,7 @@ namespace InvestmentOptions {
             Nodes.Add(capitalGains = new LeafNode("capitalGains"));
             Nodes.Add(capitalGainsTax = new LeafNode("capitalGainsTax"));
             capitalGains.showCumulative = true;
-            this.option = option;
+            this.option = option;  
         }
 
         public void buyNewProperty() {
@@ -160,13 +160,13 @@ namespace InvestmentOptions {
                 tenantsRent.mv = 0;
             }
             agentsFee.mv = 0;
-            if (includeWearAndTear.value)
+            if (Property.includeWearAndTear.value)
                 agentsFee.mv = tenantsRent.mv * 0.15f;
-            if (option.countRentSavingsAsIncome.value) {
+            if (InvestmentOption.countRentSavingsAsIncome.value && buyType == BuyType.toLiveIn) {
                 tenantsRent.mv = (tenantCount.mv + 1) * oneTenantsRent; //extra one, for the saving...
-            }//comes after agents Fee, because ME won't need an agentsFee...
+            }//comes after agents Fee, because I/myself won't need an agentsFee...
             wearAndTear.mv = propertyCount * 0;
-            if (includeWearAndTear.value)
+            if (Property.includeWearAndTear.value)
                 wearAndTear.mv = propertyCount * 90; //now, that's fairer.
             buildingsInsurance = propertyCount * 12;
             accountantsFee.mv = propertyCount * 9; //numbers are the costs

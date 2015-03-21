@@ -42,18 +42,22 @@ namespace InvestmentOptions {
             //Could fight it with a if statement...       
         }
 
-        public void BindFormToOptions(List<InvestmentOption> optionsList) {
+        public void doStuffWithOptionsList(List<InvestmentOption> optionsList) {
             this.optionsList = optionsList;
             controlPanel.listBox.Items.AddRange(optionsList.ToArray());
             addPanels();
             controlPanel.listBox.SetItemChecked(0, true);
             //controlPanel.listBox.SetItemChecked(2, true);
+            
             //NOTE: THIS IS VERY IMPORTANT.
             //MUST create form first, because it sets tree structure for the options...
             //Then must create options, before can bind the form to the options!!!
             //ACTUALLY, should make OPTIONS first... They will all have identical structure...
             //Create Data first, THEN decide how to display it... CBTL
             //I like this plan. think more tomorrow...
+            //LEAVE AS IS FOR NOW! To big a change to change it (knock on effects).
+            controlPanel.globalParameters.addCheckBoxes();
+            Property.includeWearAndTear.value = true;
         }
 
         

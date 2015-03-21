@@ -28,7 +28,7 @@ namespace InvestmentOptions {
             }
             else if (option.realWorldTree.property.buyType == Property.BuyType.toLiveIn) {
                 rent.mv = 0;
-                if (option.countRentSavingsAsIncome.value)
+                if (InvestmentOption.countRentSavingsAsIncome.value)
                     rent.mv = 330;
             }
             //RESET REST
