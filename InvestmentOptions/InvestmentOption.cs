@@ -206,14 +206,14 @@ namespace InvestmentOptions {
                 calculateOutgoings();
                 realWorldTree.bankAccount.mv += realWorldTree.ingoings.mv - realWorldTree.outgoings.mv;
                 realWorldTree.netWorth.mv += realWorldTree.ingoings.mv - realWorldTree.outgoings.mv +
-                    realWorldTree.mortgage.repayment.mv;
+                    realWorldTree.mortgage.repayment.mv + realWorldTree.property.capitalGainsProfit.mv;
                 //STORE TOTALS:
                 calculateCumulativeValues();
                 //UPDATE SERIES OF ALL NODES IN THE TREE!
                 //I SUGGEST, next BIG task, should be, put these in OWN places... //CBTL
                 realWorldTree.updateSeries(realWorldTree.Nodes);
                 //STRANGELY, above is not getting called when I click a checkBox... should... 
-                if (realWorldTree.mortgage.type == Mortgage.BuyType.interestOnly && autoInvest.value) 
+                if (autoInvest.value)
                     invest();
             }
             //treeView.labelTree(treeView.Nodes);
@@ -231,7 +231,7 @@ namespace InvestmentOptions {
         //}
 
         public void resetVariables() {
-            realWorldTree.property.resetVariables();
+            realWorldTree.property.resetIndependentVariables();
             realWorldTree.mortgage.resetVariables();
             realWorldTree.job.resetVariables();
             realWorldTree.shelter.resetVariables();

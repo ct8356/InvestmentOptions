@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace InvestmentOptions {
 
     class OptionDictator {
-        ProjectionForm form;//Can only be ONE form, because only 1 form can run at a time...
+        ProjectionForm form; //Can only be ONE form, because only 1 form can run at a time...
         public List<InvestmentOption> options = new List<InvestmentOption>();
 
         public OptionDictator() {
@@ -18,17 +18,6 @@ namespace InvestmentOptions {
             Application.Run(form);
             //seems like it does not continue with the rest of code until this is closed..
             //try putting it at the end...
-        }
-
-        public void createOptionCombination1() {
-            //This is where lionShare of conducting is done!
-            ProjectionForm form = new ProjectionForm();
-            InvestmentOption statusQuo = new InvestmentOption("", form); //this is a hypothetical scenario/world.
-            InvestmentOption flatNottingham = new InvestmentOption("", form);
-            flatNottingham.realWorldTree.mortgage.payment.mv = 100;
-            //therefore, it should have its own real world properties, like bankAccountContents, and years... 
-            //(model scale).
-            //form.presentInvestmentOptions();
         }
 
         public void createOptionCombination() {
@@ -55,6 +44,12 @@ namespace InvestmentOptions {
             buyToLiveMortgage.realWorldTree.property.buyType = Property.BuyType.toLiveIn;
             buyToLiveMortgage.realWorldTree.property.originalTenantCount = 1;
             options.Add(buyToLiveMortgage);
+
+            InvestmentOption interestOnlyLondon = new InvestmentOption("interestOnlyLondon", form);
+            interestOnlyLondon.realWorldTree.mortgage.type = Mortgage.BuyType.interestOnly;
+            interestOnlyLondon.realWorldTree.property.buyType = Property.BuyType.toLet;
+            interestOnlyLondon.realWorldTree.property.location = Property.Location.London;
+            options.Add(interestOnlyLondon);
 
             InvestmentOption threeBedLiveIn = new InvestmentOption("threeBedLiveIn", form);
             threeBedLiveIn.realWorldTree.mortgage.type = Mortgage.BuyType.repayment;

@@ -81,6 +81,8 @@ namespace InvestmentOptions {
             addCheckBox(option.autoInvest);
             addLabel(option.realWorldTree.property.buyType.ToString());
             addLabel(option.realWorldTree.mortgage.type.ToString());
+            addLabel(option.realWorldTree.property.location.ToString());
+            addLabel("BdRms/Hse: " + option.realWorldTree.property.bedroomsPerHouse);
         }
 
         public void addCheckBox(Object dataSource) { //data member is the property, to bind.

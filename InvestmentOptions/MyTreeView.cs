@@ -206,7 +206,7 @@ namespace InvestmentOptions {
             netWorth.showInChartList[0] = true;
             property.taxableTenantsRent.showInChartList[1] = true;
             property.tenantsRent.showInChartList[1] = true;
-            property.profit.showInChartList[1] = true;
+            property.profitAndSavings.showInChartList[1] = true;
             property.taxableProfit.showInChartList[1] = true;
             property.costs.showInChartList[1] = true;
             property.taxableTenantsRent.showInChartList[1] = true;
@@ -218,7 +218,8 @@ namespace InvestmentOptions {
             property.accountantsFee.showInChartList[2] = true;
             property.returnOnInvestment.showInChartList[3] = true;
             property.tenantCount.showInChartList[3] = true;
-            property.capitalGains.showInChartList[0] = true;
+            //NOTE: Should really just do this, where the these Nodes belong...
+            //otherwise, this list gets REAL messy...
         }
 
         public void updateSeries(TreeNodeCollection nodes) {

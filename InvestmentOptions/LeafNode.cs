@@ -15,7 +15,11 @@ namespace InvestmentOptions {
         public bool boolean;
         public bool showCumulative = false;
         public List<bool> showInChartList = new List<bool>();
-        public float mv;
+        public float mv; //monthyValue
+        public float mvs; //mv for a single property...
+        public float basic;
+        public float higher;
+        public float additional;
         public float cumulativeValue; //NOTE, not enough to set it to zero here.... Do it in RESET!
         public Series series;
         //List<Node> children; //Not needed now...

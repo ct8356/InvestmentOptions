@@ -10,6 +10,7 @@ namespace InvestmentOptions {
         public LeafNode houseCosts;
         public LeafNode houseBills;
         public LeafNode councilTax;
+        public float typicalRent = 330;
 
         public Shelter(InvestmentOption option) : base("shelter") {
             Nodes.Add(outgoings = new LeafNode("outgoings"));
@@ -24,12 +25,10 @@ namespace InvestmentOptions {
 
         public void resetVariables() {
             if (option.realWorldTree.property.buyType == Property.BuyType.toLet) {
-                rent.mv = 330;
+                rent.mv = typicalRent;
             }
             else if (option.realWorldTree.property.buyType == Property.BuyType.toLiveIn) {
                 rent.mv = 0;
-                if (InvestmentOption.countRentSavingsAsIncome.value)
-                    rent.mv = 330;
             }
             //RESET REST
             //
