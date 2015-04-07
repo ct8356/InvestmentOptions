@@ -111,8 +111,13 @@ namespace InvestmentOptions {
                         LeafNode viewLeafNode = (LeafNode)viewNode;
                         if (viewLeafNode.showInChartList[chart]) {
                             //initialiseSeries(chart1, node.series, node.projection);
-                            leafNode.series.Points.Count();
-                            charts[chart].Series.Add(leafNode.series);
+                            //leafNode.monthlySeries.Points.Count();
+                            if (chart == 0) {
+                                charts[chart].Series.Add(leafNode.cumulativeSeries);
+                            }
+                            else {
+                                charts[chart].Series.Add(leafNode.monthlySeries);
+                            }
                         }
                     }
                 }

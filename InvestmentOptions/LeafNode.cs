@@ -13,7 +13,6 @@ namespace InvestmentOptions {
         //NOTE: Could make this a generic class, to hold floats, and bools...
         public String Name;
         public bool boolean;
-        public bool showCumulative = false;
         public List<bool> showInChartList = new List<bool>();
         public float mv; //monthyValue
         public float mvs; //mv for a single property...
@@ -21,7 +20,8 @@ namespace InvestmentOptions {
         public float higher;
         public float additional;
         public float cumulativeValue; //NOTE, not enough to set it to zero here.... Do it in RESET!
-        public Series series;
+        public Series monthlySeries;
+        public Series cumulativeSeries;
         //List<Node> children; //Not needed now...
 
         public LeafNode() {
@@ -29,9 +29,11 @@ namespace InvestmentOptions {
         }
 
         public LeafNode(String name) : base(name) {
-            series = new Series();
+            monthlySeries = new Series();
+            cumulativeSeries = new Series();
             Name = name;
-            series.Name = name;
+            monthlySeries.Name = name;
+            cumulativeSeries.Name = name;
             Text = name;
             initialiseSeries();
             showInChartList.Add(false);
@@ -41,8 +43,10 @@ namespace InvestmentOptions {
         }
 
         public void initialiseSeries() {
-            series.ChartType = SeriesChartType.FastLine;
-            series.LegendText = series.Name;
+            monthlySeries.ChartType = SeriesChartType.FastLine;
+            monthlySeries.LegendText = monthlySeries.Name;
+            cumulativeSeries.ChartType = SeriesChartType.FastLine;
+            cumulativeSeries.LegendText = cumulativeSeries.Name;
         }
 
         public void addChild() {

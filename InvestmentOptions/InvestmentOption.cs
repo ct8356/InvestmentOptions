@@ -118,6 +118,8 @@ namespace InvestmentOptions {
         }
 
         public void calculateCumulativeValues() {
+            realWorldTree.bankAccount.cumulativeValue = realWorldTree.bankAccount.mv;
+            realWorldTree.netWorth.cumulativeValue = realWorldTree.netWorth.mv;
             realWorldTree.ingoings.cumulativeValue += realWorldTree.ingoings.mv;
             realWorldTree.job.ingoings.cumulativeValue += realWorldTree.job.ingoings.mv;
             realWorldTree.property.ingoings.cumulativeValue += realWorldTree.property.tenantsRent.mv -
@@ -237,7 +239,9 @@ namespace InvestmentOptions {
             realWorldTree.shelter.resetVariables();
             //Option specific stuff:
             realWorldTree.bankAccount.mv = 0;
+            realWorldTree.bankAccount.cumulativeValue = 0;
             realWorldTree.netWorth.mv = realWorldTree.bankAccount.mv + realWorldTree.property.propertyCount * realWorldTree.mortgage.deposit;
+            realWorldTree.netWorth.cumulativeValue = realWorldTree.netWorth.mv;
         }
 
         public override String ToString() {

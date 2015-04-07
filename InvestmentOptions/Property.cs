@@ -74,7 +74,6 @@ namespace InvestmentOptions {
             Nodes.Add(returnOnInvestment = new LeafNode("returnOnInvestment"));
             Nodes.Add(capitalGains = new LeafNode("capitalGains"));
             capitalGains.showInChartList[0] = true;
-            capitalGains.showCumulative = true;
             //SO, value, should not be a float, should be an object...
             //SO, can go capitalGains.mv.showInChartsList[0]... And it shows it!
             //could go monthly.capitalGains.value.showInChartsList (BUT, then harder to link cum, and monthly...
@@ -98,13 +97,14 @@ namespace InvestmentOptions {
             Nodes.Add(taxableCapitalGains = new LeafNode("taxableCapitalGains"));
             taxableCapitalGains.showInChartList[1] = true;
             Nodes.Add(taxableCapitalGainsBasic = new LeafNode("taxableCapitalGainsBasic"));
+            taxableCapitalGainsBasic.showInChartList[0] = true;
             taxableCapitalGainsBasic.showInChartList[1] = true;
             Nodes.Add(taxableCapitalGainsHigher = new LeafNode("taxableCapitalGainsHigher"));
+            taxableCapitalGainsHigher.showInChartList[0] = true;
             taxableCapitalGainsHigher.showInChartList[1] = true;
             Nodes.Add(capitalGainsTax = new LeafNode("capitalGainsTax"));
             Nodes.Add(capitalGainsProfit = new LeafNode("capitalGainsProfit"));
             capitalGainsProfit.showInChartList[0] = true;
-            capitalGainsProfit.showCumulative = true;
             Nodes.Add(rentSavings = new LeafNode("rentSavings"));
             this.option = option;
         }
@@ -160,6 +160,8 @@ namespace InvestmentOptions {
                 capitalGainsTax.mv = (propertyCount - 1) * capitalGainsTax.mvs;
             capitalGainsProfit.mv = capitalGains.mv - capitalGainsTax.mv;
             capitalGainsProfit.cumulativeValue += capitalGainsProfit.mv;
+            taxableCapitalGainsBasic.cumulativeValue += taxableCapitalGainsBasic.mv;
+            taxableCapitalGainsHigher.cumulativeValue += taxableCapitalGainsHigher.mv;
         }
 
         public void calculatePropertyIncomeTax() {
@@ -198,6 +200,8 @@ namespace InvestmentOptions {
         public void resetCumulativeValues() {
             capitalGains.cumulativeValue = 0;
             capitalGainsProfit.cumulativeValue = 0;
+            taxableCapitalGainsBasic.cumulativeValue = 0;
+            taxableCapitalGainsHigher.cumulativeValue = 0;
         }
 
         public void resetIndependentVariables() {

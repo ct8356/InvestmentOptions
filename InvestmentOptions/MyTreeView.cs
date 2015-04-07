@@ -192,7 +192,8 @@ namespace InvestmentOptions {
             foreach (MyTreeNode node in nodes) {
                 if (node is LeafNode) {
                     LeafNode leafNode = (LeafNode)node;
-                    leafNode.series.Points.Clear();
+                    leafNode.monthlySeries.Points.Clear();
+                    leafNode.cumulativeSeries.Points.Clear();
                     //for (int interval = 0; interval < node.intervals; interval++) {
                     //    leafNode.projection[interval] = 0;
                     //}
@@ -226,14 +227,12 @@ namespace InvestmentOptions {
             foreach (MyTreeNode node in nodes) {
                 if (node is LeafNode) {
                     LeafNode leafNode = (LeafNode) node;
-                    if (leafNode.showCumulative) {
-                        leafNode.series.Points.AddY(leafNode.cumulativeValue);
-                        leafNode.series.LegendText = leafNode.series.Name + leafNode.cumulativeValue;
-                    }
-                    else {
-                        leafNode.series.Points.AddY(leafNode.mv);
-                        leafNode.series.LegendText = leafNode.series.Name + leafNode.mv;
-                    }
+                        leafNode.cumulativeSeries.Points.AddY(leafNode.cumulativeValue);
+                        leafNode.cumulativeSeries.LegendText =
+                            leafNode.cumulativeSeries.Name + " £" + String.Format("{0:n}", leafNode.cumulativeValue);
+                        leafNode.monthlySeries.Points.AddY(leafNode.mv);
+                        leafNode.monthlySeries.LegendText = 
+                            leafNode.monthlySeries.Name + " £" +String.Format("{0:n}", leafNode.mv);
                 }
                 updateSeries(node.Nodes);
             }
