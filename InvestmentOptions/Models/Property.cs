@@ -9,7 +9,6 @@ namespace InvestmentOptions {
         //NOTE: You can express which LEAFNODES are DEPENDENT, and INDEPENDENT, with private and public!
         //or setters, vs no setters!!!
         public event PropertyChangedEventHandler PropertyChanged;
-        InvestmentOption option;
         public float price;
         public enum BuyType { toLiveIn, toLet }; //buyToLive or buyToLet
         public BuyType buyType;
@@ -119,8 +118,8 @@ namespace InvestmentOptions {
 
         public void calculatePropertyOutgoings() {
             outgoings.mv = agentsFee.mv + wearAndTear.mv + buildingsInsurance +
-                accountantsFee.mv + option.RealWorldTree.mortgage.interest.mv +
-                option.RealWorldTree.mortgage.repayment.mv;
+                accountantsFee.mv + option.mortgage.interest.mv +
+                option.mortgage.repayment.mv;
         }
 
         public void calculateCapitalGainsProfit() {
@@ -170,11 +169,11 @@ namespace InvestmentOptions {
             taxableTenantsRent.mv = tenantsRent.mv;
             calculatePropertyOutgoings();
             taxableProfit.mv = taxableTenantsRent.mv -
-                (outgoings.mv - option.RealWorldTree.mortgage.repayment.mv);
+                (outgoings.mv - option.mortgage.repayment.mv);
             rentSavings.mv = 0;
             switch (buyType) {
                 case Property.BuyType.toLiveIn: //Buy to live in
-                    rentSavings.mv = option.RealWorldTree.shelter.typicalRent;
+                    rentSavings.mv = option.shelter.typicalRent;
                     if (rentARoomScheme.Value) {
                         taxableTenantsRent.mv = tenantsRent.mv - 4250 / 12;
                         //if (taxableTenantsRent.mv < 0) taxableTenantsRent.mv = 0;
@@ -195,7 +194,8 @@ namespace InvestmentOptions {
                 incomeTax.mv = 0;
             profitAndSavings.mv = taxableProfit.mv - incomeTax.mv + rentSavings.mv;
             if (option.zeroInvestment) {
-                profitAndSavings.mv = option.RealWorldTree.mortgage.repayment.cumulativeValue * option.RealWorldTree.mortgage.interestRate; 
+                profitAndSavings.mv = 
+                    option.mortgage.repayment.cumulativeValue * option.mortgage.interestRate; 
             }
         }
 
@@ -222,7 +222,7 @@ namespace InvestmentOptions {
             }
             //RESET REST
             tenantCount.mv = originalTenantCount;
-            moneyInvested = propertyCount * option.RealWorldTree.mortgage.deposit;
+            moneyInvested = propertyCount * option.mortgage.deposit;
             if (option.zeroInvestment) {
                 moneyInvested = 0;
             }
@@ -251,11 +251,11 @@ namespace InvestmentOptions {
 
         public void updateVariables() {
             calculatePropertyIncomeTax();
-            costs.mv = outgoings.mv - option.RealWorldTree.mortgage.repayment.mv;
+            costs.mv = outgoings.mv - option.mortgage.repayment.mv;
             if (option.zeroInvestment) {
                 costs.mv = 0;
             }
-            moneyInvested += option.RealWorldTree.mortgage.repayment.mv;
+            moneyInvested += option.mortgage.repayment.mv;
             returnOnInvestment.mv = 12 * profitAndSavings.mv / moneyInvested * 100;
             calculateCapitalGainsProfit();
             housePrice = housePrice * (1 + percentageGrowth);

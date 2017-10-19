@@ -100,36 +100,36 @@ namespace InvestmentOptions {
         //}
 
         public void Invest() {
-            if (RealWorldTree.bankAccount.mv > RealWorldTree.mortgage.deposit) {
+            if (bankAccount.mv > mortgage.deposit) {
                 //invest
-                RealWorldTree.mortgage.moneyBorrowed += RealWorldTree.property.price - RealWorldTree.mortgage.deposit; // not that important.
-                RealWorldTree.mortgage.moneyOwed += RealWorldTree.property.housePrice - RealWorldTree.mortgage.deposit;
-                RealWorldTree.bankAccount.mv -= RealWorldTree.mortgage.deposit;
-                RealWorldTree.property.moneyInvested += RealWorldTree.mortgage.deposit;
+                mortgage.moneyBorrowed += property.price - mortgage.deposit; // not that important.
+                mortgage.moneyOwed += property.housePrice - mortgage.deposit;
+                bankAccount.mv -= mortgage.deposit;
+                property.moneyInvested += mortgage.deposit;
                 //Benefits
-                RealWorldTree.property.buyNewProperty();
+                property.buyNewProperty();
             } //something you forgetting to update. what is it? YES the extra features that make you money!
         }
 
         public void CalculateCumulativeValues() {
-            RealWorldTree.bankAccount.cumulativeValue = RealWorldTree.bankAccount.mv;
-            RealWorldTree.netWorth.cumulativeValue = RealWorldTree.netWorth.mv;
-            RealWorldTree.ingoings.cumulativeValue += RealWorldTree.ingoings.mv;
-            RealWorldTree.job.ingoings.cumulativeValue += RealWorldTree.job.ingoings.mv;
-            RealWorldTree.property.ingoings.cumulativeValue += RealWorldTree.property.tenantsRent.mv -
-                RealWorldTree.property.incomeTax.mv;
-            RealWorldTree.outgoings.cumulativeValue += RealWorldTree.outgoings.mv;
-            RealWorldTree.shelter.outgoings.cumulativeValue += RealWorldTree.shelter.houseCosts.mv;
-            RealWorldTree.life.outgoings.cumulativeValue += RealWorldTree.life.costs.mv;
-            RealWorldTree.property.outgoings.cumulativeValue += RealWorldTree.property.outgoings.mv;
-            RealWorldTree.mortgage.repayment.cumulativeValue += RealWorldTree.mortgage.repayment.mv;
-            RealWorldTree.mortgage.interest.cumulativeValue += RealWorldTree.mortgage.interest.mv;
-            RealWorldTree.mortgage.payment.cumulativeValue = RealWorldTree.mortgage.payment.mv;
-            RealWorldTree.property.wearAndTear.cumulativeValue += RealWorldTree.property.wearAndTear.mv;
-            RealWorldTree.property.agentsFee.cumulativeValue += RealWorldTree.property.agentsFee.mv;
-            RealWorldTree.property.accountantsFee.cumulativeValue += RealWorldTree.property.accountantsFee.mv;
-            RealWorldTree.property.incomeTax.cumulativeValue += RealWorldTree.property.incomeTax.mv;
-            RealWorldTree.job.studentLoanRepayments.cumulativeValue += RealWorldTree.job.studentLoanRepayments.mv;
+            bankAccount.cumulativeValue = bankAccount.mv;
+            netWorth.cumulativeValue = netWorth.mv;
+            ingoings.cumulativeValue += ingoings.mv;
+            job.ingoings.cumulativeValue += job.ingoings.mv;
+            property.ingoings.cumulativeValue += property.tenantsRent.mv -
+                property.incomeTax.mv;
+            outgoings.cumulativeValue += outgoings.mv;
+            shelter.outgoings.cumulativeValue += shelter.houseCosts.mv;
+            life.outgoings.cumulativeValue += life.costs.mv;
+            property.outgoings.cumulativeValue += property.outgoings.mv;
+            mortgage.repayment.cumulativeValue += mortgage.repayment.mv;
+            mortgage.interest.cumulativeValue += mortgage.interest.mv;
+            mortgage.payment.cumulativeValue = mortgage.payment.mv;
+            property.wearAndTear.cumulativeValue += property.wearAndTear.mv;
+            property.agentsFee.cumulativeValue += property.agentsFee.mv;
+            property.accountantsFee.cumulativeValue += property.accountantsFee.mv;
+            property.incomeTax.cumulativeValue += property.incomeTax.mv;
+            job.studentLoanRepayments.cumulativeValue += job.studentLoanRepayments.mv;
             //realWorldTree.property.capitalGains.cumulativeValue += realWorldTree.job.student
         }//Note, this can easily be done in own nodes... easier with events? or method waterfall?
         //either way, the method needs to be called by something... (by the delegate, or by the upper method).
@@ -139,14 +139,14 @@ namespace InvestmentOptions {
 
         public void calculateIngoings() {
             //just have to make sure all equations are well defined here...
-            bankInterest = RealWorldTree.bankAccount.mv * bankInterestRate; //Monthly interest...     
-            RealWorldTree.ingoings.mv = RealWorldTree.job.ingoings.mv + bankInterest + RealWorldTree.property.tenantsRent.mv -
-                RealWorldTree.property.incomeTax.mv;
+            bankInterest = bankAccount.mv * bankInterestRate; //Monthly interest...     
+            ingoings.mv = job.ingoings.mv + bankInterest + property.tenantsRent.mv -
+                property.incomeTax.mv;
         }
 
         public void calculateOutgoings() {
-            RealWorldTree.shelter.houseCosts.mv = RealWorldTree.shelter.rent.mv + RealWorldTree.shelter.houseBills.mv + RealWorldTree.shelter.councilTax.mv;
-            RealWorldTree.outgoings.mv = RealWorldTree.shelter.houseCosts.mv + RealWorldTree.life.costs.mv + RealWorldTree.property.outgoings.mv;
+            shelter.houseCosts.mv = shelter.rent.mv + shelter.houseBills.mv + shelter.councilTax.mv;
+            outgoings.mv = shelter.houseCosts.mv + life.costs.mv + property.outgoings.mv;
         }
 
         //public void initialiseKeyList() {
@@ -209,15 +209,15 @@ namespace InvestmentOptions {
         }
 
         public void ResetVariables() {
-            RealWorldTree.property.resetIndependentVariables();
-            RealWorldTree.mortgage.resetVariables();
-            RealWorldTree.job.resetVariables();
-            RealWorldTree.shelter.resetVariables();
+            property.resetIndependentVariables();
+            mortgage.resetVariables();
+            job.resetVariables();
+            shelter.resetVariables();
             //Option specific stuff:
-            RealWorldTree.bankAccount.mv = 0;
-            RealWorldTree.bankAccount.cumulativeValue = 0;
-            RealWorldTree.netWorth.mv = RealWorldTree.bankAccount.mv + RealWorldTree.property.propertyCount * RealWorldTree.mortgage.deposit;
-            RealWorldTree.netWorth.cumulativeValue = RealWorldTree.netWorth.mv;
+            bankAccount.mv = 0;
+            bankAccount.cumulativeValue = 0;
+            netWorth.mv = bankAccount.mv + property.propertyCount * mortgage.deposit;
+            netWorth.cumulativeValue = netWorth.mv;
         }
 
         public override String ToString() {

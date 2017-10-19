@@ -8,7 +8,6 @@ namespace InvestmentOptions {
     public class Mortgage : BranchNode {
         public enum BuyType { repayment, interestOnly };
         public BuyType type;
-        public InvestmentOption option;
         //MORTGAGE PAYMENTS
         public float deposit = 25000;
         public float moneyBorrowed;
@@ -53,9 +52,10 @@ namespace InvestmentOptions {
         }
 
         public void resetVariables() {
-            moneyBorrowed = option.RealWorldTree.property.originalPropertyCount * (option.RealWorldTree.property.housePrice - deposit);
+            moneyBorrowed = 
+                option.property.originalPropertyCount * (option.property.housePrice - deposit);
             if (option.noMortgageNeeded) {
-                option.RealWorldTree.property.moneyInvested = option.RealWorldTree.property.originalHousePrice;
+                option.property.moneyInvested = option.property.originalHousePrice;
                 moneyBorrowed = 0;
             }
             moneyOwed = moneyBorrowed;

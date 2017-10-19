@@ -8,7 +8,8 @@ using System.Windows.Forms.VisualStyles;
 namespace InvestmentOptions {
     public class MyTreeView : TreeView {
         //NOTE: A TreeView HAS to have an InvestmentOption as a property.
-        //Since its childNodes (for the moment) need access to an InvestmentOption... (for int intervals)..
+        //Since its childNodes (for the moment) need access to an InvestmentOption... 
+        //(for int intervals)..
         Font tagFont = new Font("Helvetica", 8, FontStyle.Bold);
         InvestmentOption Option { get; set; }
         public ControlPanel ControlPanel { get; set; }
@@ -16,6 +17,7 @@ namespace InvestmentOptions {
 
         public MyTreeView(InvestmentOption option) {
             Option = option;
+            Option.AddChildren();
             AddChildren();
             DrawMode = TreeViewDrawMode.OwnerDrawText; //Change to OwnerDrawText.
             //Ahah, so maybe, since it is just a TextGlyph, that is why rectangle fudge is needed? Not sure...
@@ -103,7 +105,7 @@ namespace InvestmentOptions {
             foreach (TreeNode node in nodes) {
                 if (node is LeafNode) {
                     LeafNode leafNode = (LeafNode)node;
-                    Binding binding = new Binding("Checked", Option.RealWorldTree.property, "rentARoomScheme");
+                    Binding binding = new Binding("Checked", Option.property, "rentARoomScheme");
                     binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
                     ControlPanel.realWorldTreeView.DataBindings.Add(binding); 
                 }
@@ -173,22 +175,22 @@ namespace InvestmentOptions {
         }
 
         public void SetDefaultNodeToChartMapping() {
-            bankAccount.ShowInChartList[0] = true;
-            netWorth.ShowInChartList[0] = true;
-            property.taxableTenantsRent.ShowInChartList[1] = true;
-            property.tenantsRent.ShowInChartList[1] = true;
-            property.profitAndSavings.ShowInChartList[1] = true;
-            property.taxableProfit.ShowInChartList[1] = true;
-            property.costs.ShowInChartList[1] = true;
-            property.taxableTenantsRent.ShowInChartList[1] = true;
-            property.incomeTax.ShowInChartList[1] = true;
+            Option.bankAccount.ShowInChartList[0] = true;
+            Option.netWorth.ShowInChartList[0] = true;
+            Option.property.taxableTenantsRent.ShowInChartList[1] = true;
+            Option.property.tenantsRent.ShowInChartList[1] = true;
+            Option.property.profitAndSavings.ShowInChartList[1] = true;
+            Option.property.taxableProfit.ShowInChartList[1] = true;
+            Option.property.costs.ShowInChartList[1] = true;
+            Option.property.taxableTenantsRent.ShowInChartList[1] = true;
+            Option.property.incomeTax.ShowInChartList[1] = true;
             //shelter.rent.showInChartList[1] = true;
-            mortgage.interest.ShowInChartList[2] = true;
-            property.wearAndTear.ShowInChartList[2] = true;
-            property.agentsFee.ShowInChartList[2] = true;
-            property.accountantsFee.ShowInChartList[2] = true;
-            property.returnOnInvestment.ShowInChartList[3] = true;
-            property.tenantCount.ShowInChartList[3] = true;
+            Option.mortgage.interest.ShowInChartList[2] = true;
+            Option.property.wearAndTear.ShowInChartList[2] = true;
+            Option.property.agentsFee.ShowInChartList[2] = true;
+            Option.property.accountantsFee.ShowInChartList[2] = true;
+            Option.property.returnOnInvestment.ShowInChartList[3] = true;
+            Option.property.tenantCount.ShowInChartList[3] = true;
             //NOTE: Should really just do this, where the these Nodes belong...
             //otherwise, this list gets REAL messy...
         }

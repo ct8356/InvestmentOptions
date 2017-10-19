@@ -78,12 +78,12 @@ namespace InvestmentOptions {
             optionsPanel.Dock = DockStyle.Top;
             optionsPanel.Height = 60;
             Controls.Add(optionsPanel);
-            addCheckBox(option.RealWorldTree.property.rentARoomScheme);
+            addCheckBox(option.property.rentARoomScheme);
             addCheckBox(option.autoInvest);
-            addLabel(option.RealWorldTree.property.buyType.ToString());
-            addLabel(option.RealWorldTree.mortgage.type.ToString());
-            addLabel(option.RealWorldTree.property.location.ToString());
-            addLabel("BdRms/Hse: " + option.RealWorldTree.property.bedroomsPerHouse);
+            addLabel(option.property.buyType.ToString());
+            addLabel(option.mortgage.type.ToString());
+            addLabel(option.property.location.ToString());
+            addLabel("BdRms/Hse: " + option.property.bedroomsPerHouse);
         }
 
         public void addCheckBox(Object dataSource) { //data member is the property, to bind.
