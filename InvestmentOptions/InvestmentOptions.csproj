@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
@@ -47,38 +48,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BranchNode.cs" />
-    <Compile Include="ControlPanel.cs">
+    <Compile Include="Models\BranchNode.cs" />
+    <Compile Include="Views\ControlPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GlobalParameters.cs">
+    <Compile Include="Views\GlobalParameters.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Job.cs" />
-    <Compile Include="Life.cs" />
-    <Compile Include="Mortgage.cs" />
-    <Compile Include="MyBoolean.cs" />
-    <Compile Include="MyCheckedListBox.cs">
+    <Compile Include="Models\Job.cs" />
+    <Compile Include="Models\Life.cs" />
+    <Compile Include="Models\Mortgage.cs" />
+    <Compile Include="Other\Boolean.cs" />
+    <Compile Include="Views\MyCheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="LeafNode.cs" />
-    <Compile Include="MyTreeNode.cs" />
-    <Compile Include="ProjectionForm.cs">
+    <Compile Include="Models\LeafNode.cs" />
+    <Compile Include="Models\TreeNode.cs" />
+    <Compile Include="Views\ProjectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="InvestmentOption.cs" />
-    <Compile Include="OptionDictator.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="ProjectionPanel.cs">
+    <Compile Include="Models\InvestmentOption.cs" />
+    <Compile Include="Other\OptionDictator.cs" />
+    <Compile Include="Other\Program.cs" />
+    <Compile Include="Views\ProjectionPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Property.cs" />
-    <Compile Include="MyTreeView.cs">
+    <Compile Include="Models\Property.cs" />
+    <Compile Include="Views\MyTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Shelter.cs" />
-    <EmbeddedResource Include="ProjectionForm.resx">
+    <Compile Include="Models\Shelter.cs" />
+    <EmbeddedResource Include="Views\ProjectionForm.resx">
       <DependentUpon>ProjectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -99,6 +100,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

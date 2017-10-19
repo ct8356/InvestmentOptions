@@ -15,12 +15,14 @@ namespace InvestmentOptions {
         public BuyType buyType;
         public enum Location { Nottingham, London };
         public Location location = Location.Nottingham;
-        public MyBoolean rentARoomScheme = new MyBoolean("rentARoomScheme");
-        public static MyBoolean includeWearAndTear = new MyBoolean("includeWearAndTear");
+        public Boolean rentARoomScheme = new Boolean("rentARoomScheme");
+        public static Boolean includeWearAndTear = new Boolean("includeWearAndTear");
         public LeafNode incomeTax;
         public LeafNode ingoings;
         public LeafNode outgoings;
         public LeafNode tenantCount;
+        public float originalHousePrice;
+        public float housePrice;
         public int originalPropertyCount = 1; //default
         public int propertyCount;
         public int originalBedroomCount;
@@ -73,7 +75,7 @@ namespace InvestmentOptions {
             Nodes.Add(incomeTax = new LeafNode("incomeTax")); //BOOM,instant'g and assign'g same time!
             Nodes.Add(returnOnInvestment = new LeafNode("returnOnInvestment"));
             Nodes.Add(capitalGains = new LeafNode("capitalGains"));
-            capitalGains.showInChartList[0] = true;
+            capitalGains.ShowInChartList[0] = true;
             //SO, value, should not be a float, should be an object...
             //SO, can go capitalGains.mv.showInChartsList[0]... And it shows it!
             //could go monthly.capitalGains.value.showInChartsList (BUT, then harder to link cum, and monthly...
@@ -95,16 +97,16 @@ namespace InvestmentOptions {
             //NOTE also, should all be handled as data (in a database) really, not objects.
             //but objects ok actually.
             Nodes.Add(taxableCapitalGains = new LeafNode("taxableCapitalGains"));
-            taxableCapitalGains.showInChartList[1] = true;
+            taxableCapitalGains.ShowInChartList[1] = true;
             Nodes.Add(taxableCapitalGainsBasic = new LeafNode("taxableCapitalGainsBasic"));
-            taxableCapitalGainsBasic.showInChartList[0] = true;
-            taxableCapitalGainsBasic.showInChartList[1] = true;
+            taxableCapitalGainsBasic.ShowInChartList[0] = true;
+            taxableCapitalGainsBasic.ShowInChartList[1] = true;
             Nodes.Add(taxableCapitalGainsHigher = new LeafNode("taxableCapitalGainsHigher"));
-            taxableCapitalGainsHigher.showInChartList[0] = true;
-            taxableCapitalGainsHigher.showInChartList[1] = true;
+            taxableCapitalGainsHigher.ShowInChartList[0] = true;
+            taxableCapitalGainsHigher.ShowInChartList[1] = true;
             Nodes.Add(capitalGainsTax = new LeafNode("capitalGainsTax"));
             Nodes.Add(capitalGainsProfit = new LeafNode("capitalGainsProfit"));
-            capitalGainsProfit.showInChartList[0] = true;
+            capitalGainsProfit.ShowInChartList[0] = true;
             Nodes.Add(rentSavings = new LeafNode("rentSavings"));
             this.option = option;
         }
@@ -117,8 +119,8 @@ namespace InvestmentOptions {
 
         public void calculatePropertyOutgoings() {
             outgoings.mv = agentsFee.mv + wearAndTear.mv + buildingsInsurance +
-                accountantsFee.mv + option.realWorldTree.mortgage.interest.mv +
-                option.realWorldTree.mortgage.repayment.mv;
+                accountantsFee.mv + option.RealWorldTree.mortgage.interest.mv +
+                option.RealWorldTree.mortgage.repayment.mv;
         }
 
         public void calculateCapitalGainsProfit() {
@@ -128,10 +130,10 @@ namespace InvestmentOptions {
             allowableCapitalGains.higher = (150000 - 12000) / option.intervals; //??? guess..
             switch (location) {
                 case Location.Nottingham:
-                    percentageGrowth = 0.03f / 12;
+                    percentageGrowth = 0.035f / 12;
                     break;
                 case Location.London:
-                    percentageGrowth = 0.07f / 12;
+                    percentageGrowth = 0.045f / 12;
                     break;
             }
             //WHATTTT!!! BUT I made 30,000 in capitalGains...
@@ -139,7 +141,7 @@ namespace InvestmentOptions {
             //SO SURELY SOME of my taxableCapGains falls in to the HIGHER bracket???
             //AHHH but allowable CapGains is £11,000, SO allowable capGains is 20,000 + 11,000 = £31,000,
             //SO I am JUST ABOUT OK!!! only pay 18% on most of my capGains...
-            capitalGains.mvs = option.realWorldTree.mortgage.housePrice * percentageGrowth;
+            capitalGains.mvs = housePrice * percentageGrowth;
             capitalGains.mv = propertyCount * capitalGains.mvs;
             capitalGains.cumulativeValue += capitalGains.mv;
             taxableCapitalGains.mvs = capitalGains.mvs - capitalGainsAllowance / option.intervals;
@@ -168,12 +170,12 @@ namespace InvestmentOptions {
             taxableTenantsRent.mv = tenantsRent.mv;
             calculatePropertyOutgoings();
             taxableProfit.mv = taxableTenantsRent.mv -
-                (outgoings.mv - option.realWorldTree.mortgage.repayment.mv);
+                (outgoings.mv - option.RealWorldTree.mortgage.repayment.mv);
             rentSavings.mv = 0;
             switch (buyType) {
                 case Property.BuyType.toLiveIn: //Buy to live in
-                    rentSavings.mv = option.realWorldTree.shelter.typicalRent;
-                    if (rentARoomScheme.value) {
+                    rentSavings.mv = option.RealWorldTree.shelter.typicalRent;
+                    if (rentARoomScheme.Value) {
                         taxableTenantsRent.mv = tenantsRent.mv - 4250 / 12;
                         //if (taxableTenantsRent.mv < 0) taxableTenantsRent.mv = 0;
                         //not nec... profit CAN be negative... Just shows, that losing money...
@@ -193,7 +195,7 @@ namespace InvestmentOptions {
                 incomeTax.mv = 0;
             profitAndSavings.mv = taxableProfit.mv - incomeTax.mv + rentSavings.mv;
             if (option.zeroInvestment) {
-                profitAndSavings.mv = option.realWorldTree.mortgage.repayment.cumulativeValue * option.realWorldTree.mortgage.interestRate; 
+                profitAndSavings.mv = option.RealWorldTree.mortgage.repayment.cumulativeValue * option.RealWorldTree.mortgage.interestRate; 
             }
         }
 
@@ -220,10 +222,12 @@ namespace InvestmentOptions {
             }
             //RESET REST
             tenantCount.mv = originalTenantCount;
-            moneyInvested = propertyCount * option.realWorldTree.mortgage.deposit;
+            moneyInvested = propertyCount * option.RealWorldTree.mortgage.deposit;
             if (option.zeroInvestment) {
                 moneyInvested = 0;
             }
+            originalHousePrice = 100000;
+            housePrice = originalHousePrice;
             updateMultiples();
             resetCumulativeValues();
         } //Could call this with an event, OR just call it in upper method...
@@ -237,7 +241,7 @@ namespace InvestmentOptions {
             }
             agentsFee.mv = 0;
             wearAndTear.mv = propertyCount * 0;
-            if (Property.includeWearAndTear.value) {
+            if (Property.includeWearAndTear.Value) {
                 agentsFee.mv = tenantsRent.mv * 0.15f;
                 wearAndTear.mv = propertyCount * 90; //now, that's fairer.
             }
@@ -247,13 +251,14 @@ namespace InvestmentOptions {
 
         public void updateVariables() {
             calculatePropertyIncomeTax();
-            costs.mv = outgoings.mv - option.realWorldTree.mortgage.repayment.mv;
+            costs.mv = outgoings.mv - option.RealWorldTree.mortgage.repayment.mv;
             if (option.zeroInvestment) {
                 costs.mv = 0;
             }
-            moneyInvested += option.realWorldTree.mortgage.repayment.mv;
+            moneyInvested += option.RealWorldTree.mortgage.repayment.mv;
             returnOnInvestment.mv = 12 * profitAndSavings.mv / moneyInvested * 100;
             calculateCapitalGainsProfit();
+            housePrice = housePrice * (1 + percentageGrowth);
         }
 
     }

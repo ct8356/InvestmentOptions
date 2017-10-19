@@ -7,6 +7,8 @@ using System.Windows.Forms;
 namespace InvestmentOptions {
 
     public class MyCheckedListBox : CheckedListBox {
+        //Solutions in binding a datasource to a CheckedListBox aren't very elegant. 
+        //Use a DataGridView with a Checkbox column instead.
         ProjectionForm form;
         public int checkedItemsCount = 0;
 
@@ -22,14 +24,14 @@ namespace InvestmentOptions {
         protected override void OnItemCheck(ItemCheckEventArgs checkEvent) {
             base.OnItemCheck(checkEvent);
             if (checkEvent.NewValue == CheckState.Checked) {
-                form.optionsList[checkEvent.Index].showInPanel = true;
+                form.OptionsList[checkEvent.Index].showInPanel = true;
                 checkedItemsCount++;
             }
             if (checkEvent.NewValue == CheckState.Unchecked) {
-                form.optionsList[checkEvent.Index].showInPanel = false;
+                form.OptionsList[checkEvent.Index].showInPanel = false;
                 checkedItemsCount--;
             }
-            form.updatePanels(this, null);
+            form.UpdatePanels(this, null);
             //TBH, SHOULD not have to do this HERE! 
             //the things that need updating, should listen for the cue, and update themselves!
             //fits better with the idea that objects do stuff to themselves, and look after themselves!

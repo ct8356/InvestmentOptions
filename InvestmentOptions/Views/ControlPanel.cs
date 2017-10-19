@@ -9,7 +9,7 @@ namespace InvestmentOptions {
 
     public class ControlPanel : TableLayoutPanel {
         public ProjectionForm form;
-        public MyCheckedListBox listBox;
+        public MyCheckedListBox ListBox { get; set; }
         public MyTreeView realWorldTreeView;
         public GlobalParameters globalParameters;
 
@@ -20,7 +20,7 @@ namespace InvestmentOptions {
             globalParameters = new GlobalParameters(form);
             InvestmentOption dudOption = new InvestmentOption("dud"); //this is the DUD constructor.
             realWorldTreeView = new MyTreeView(dudOption); //needs to be like this,
-            realWorldTreeView.setDefaultNodeToChartMapping();
+            realWorldTreeView.SetDefaultNodeToChartMapping();
             //since atm, RWT made inside the option.
             //needs to be, since each RWT needs an option!
             //EXCEPT this one!
@@ -33,16 +33,16 @@ namespace InvestmentOptions {
             Text = "Christiaan Panel";
             BorderStyle = BorderStyle.FixedSingle;
             Dock = DockStyle.Fill;
-            defineChildrenOrder();
+            DefineChildrenOrder();
         }
 
-        public void defineChildrenOrder() {
+        public void DefineChildrenOrder() {
             //sibling order is important, 
             //especially if docking...
             RowStyles.Add(new RowStyle(SizeType.AutoSize));
             RowStyles.Add(new RowStyle(SizeType.AutoSize));
             RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            Controls.Add(listBox = new MyCheckedListBox(form));
+            Controls.Add(ListBox = new MyCheckedListBox(form));
             Controls.Add(globalParameters);
             Controls.Add(realWorldTreeView);
             //OK MATE! Pretty sure, that tableLayoutPanel is bit lame...

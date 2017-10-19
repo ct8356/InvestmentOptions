@@ -12,19 +12,19 @@ namespace InvestmentOptions {
     public class ProjectionPanel : FlowLayoutPanel {
         public InvestmentOption option;
         public List<LeafNode> nodeList;
-        List<Chart> charts = new List<Chart>();
-        public ProjectionForm form;
+        private List<Chart> Charts { get; set; } = new List<Chart>();
+        public ProjectionForm Form { get; set; }
         public FlowLayoutPanel optionsPanel;
         //public delegate void PropertyChangedEventHandler();
 
         public ProjectionPanel(InvestmentOption option, ProjectionForm form) {
-            this.form = form;
+            Form = form;
             //PANEL STUFF
             Text = "Christiaan Panel";
             FlowDirection = FlowDirection.TopDown;
             //OTHER
             this.option = option;
-            initialiseChildren();
+            InitialiseChildren();
             BorderStyle = BorderStyle.FixedSingle;
             //SUBCRIBE TO EVENTS (of the static booleans).
             InvestmentOption.countRentSavingsAsIncome.PropertyChanged += 
@@ -33,39 +33,40 @@ namespace InvestmentOptions {
                 new PropertyChangedEventHandler(handlePropertyChanged);
         }
 
-        public void initialiseChildren() {
+        private void InitialiseChildren() {
             //INSTANTIATE CHARTS
-            charts.Add(new Chart());
-            charts.Add(new Chart());
-            charts.Add(new Chart());
-            charts.Add(new Chart());
+            Charts.Add(new Chart());
+            Charts.Add(new Chart());
+            Charts.Add(new Chart());
+            Charts.Add(new Chart());
             //SETUP OPTIONS
             initialiseOptionsPanel();
             //SETUP CHARTS
-            initialiseChart(charts[0]);
-            charts[0].ChartAreas[0].AxisY.Maximum = 140000;
+            InitialiseChart(Charts[0]);
+            Charts[0].ChartAreas[0].AxisY.Maximum = 140000;
             //title1.DockedToChartArea = chart1.ChartAreas[0].Name;
-            initialiseChart(charts[1]);
-            charts[1].ChartAreas[0].AxisY.Maximum = 2000;
+            InitialiseChart(Charts[1]);
+            Charts[1].ChartAreas[0].AxisY.Maximum = 2000;
             //chart2.Titles[0].DockedToChartArea = chart2.ChartAreas[0].Name;
-            initialiseChart(charts[2]);
-            charts[2].ChartAreas[0].AxisY.Maximum = 2000;
-            initialiseChart(charts[3]);
-            charts[3].ChartAreas[0].AxisY.Maximum = 10;
-            charts[3].ChartAreas[0].AxisY.Minimum = -4;
-            foreach (Chart chart in charts) {
+            InitialiseChart(Charts[2]);
+            Charts[2].ChartAreas[0].AxisY.Maximum = 2000;
+            InitialiseChart(Charts[3]);
+            Charts[3].ChartAreas[0].AxisY.Maximum = 10;
+            Charts[3].ChartAreas[0].AxisY.Minimum = -4;
+            foreach (Chart chart in Charts) {
                 //chart.Dock = DockStyle.Fill;
             }
         }
 
-        public void initialiseChart(Chart chart) {
+        public void InitialiseChart(Chart chart) {
             ChartArea chartArea = new ChartArea();
             Legend legend = new Legend();
             chart.ChartAreas.Add(chartArea);
-            chart.Size = new Size(500, 160);
+            chart.Size = new Size(500, 150);
             chart.Text = "chart1";
             Controls.Add(chart);
-            Title title1 = new Title(option.Name, Docking.Top, new Font("Verdana", 12), Color.Black);
+            Title title1 = new Title
+                (option.Name, Docking.Top, new Font("Verdana", 12), Color.Black);
             //chart.Titles.Add(title1);
             chart.Legends.Add(legend);
         }
@@ -77,19 +78,19 @@ namespace InvestmentOptions {
             optionsPanel.Dock = DockStyle.Top;
             optionsPanel.Height = 60;
             Controls.Add(optionsPanel);
-            addCheckBox(option.realWorldTree.property.rentARoomScheme);
+            addCheckBox(option.RealWorldTree.property.rentARoomScheme);
             addCheckBox(option.autoInvest);
-            addLabel(option.realWorldTree.property.buyType.ToString());
-            addLabel(option.realWorldTree.mortgage.type.ToString());
-            addLabel(option.realWorldTree.property.location.ToString());
-            addLabel("BdRms/Hse: " + option.realWorldTree.property.bedroomsPerHouse);
+            addLabel(option.RealWorldTree.property.buyType.ToString());
+            addLabel(option.RealWorldTree.mortgage.type.ToString());
+            addLabel(option.RealWorldTree.property.location.ToString());
+            addLabel("BdRms/Hse: " + option.RealWorldTree.property.bedroomsPerHouse);
         }
 
         public void addCheckBox(Object dataSource) { //data member is the property, to bind.
-            MyBoolean myBoolean = (MyBoolean)dataSource;
+            Boolean myBoolean = (Boolean)dataSource;
             CheckBox checkBox = new CheckBox();
             optionsPanel.Controls.Add(checkBox);
-            checkBox.Name = myBoolean.name;
+            checkBox.Name = myBoolean.Name;
             checkBox.Text = checkBox.Name;
             Binding binding = new Binding("Checked", dataSource, "value");
             binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
@@ -98,30 +99,30 @@ namespace InvestmentOptions {
             myBoolean.PropertyChanged += new PropertyChangedEventHandler(handlePropertyChanged);
         }
 
-        public void addCheckedSeriesToCharts(TreeNodeCollection nodes) {
-            foreach (MyTreeNode node in nodes) {
+        public void AddCheckedSeriesToCharts(TreeNodeCollection nodes) {
+            foreach (TreeNode node in nodes) {
                 //node.Text = node.Name + ": £" + String.Format("{0:n}", node.cumulativeValue);
                 if (node is LeafNode) {
                     LeafNode leafNode = (LeafNode) node;
                     //NEED TO DO SOME MAGIC HERE!
-                    for (int chart = 0; chart < charts.Count; chart++) {
+                    for (int chart = 0; chart < Charts.Count; chart++) {
                         String path = leafNode.FullPath;
-                        TreeNode viewNode =
-                            form.controlPanel.realWorldTreeView.getNodeFromPath(form.controlPanel.realWorldTreeView.Nodes, path);
+                        System.Windows.Forms.TreeNode viewNode =
+                            Form.controlPanel.realWorldTreeView.GetNodeFromPath(Form.controlPanel.realWorldTreeView.Nodes, path);
                         LeafNode viewLeafNode = (LeafNode)viewNode;
-                        if (viewLeafNode.showInChartList[chart]) {
+                        if (viewLeafNode.ShowInChartList[chart]) {
                             //initialiseSeries(chart1, node.series, node.projection);
                             //leafNode.monthlySeries.Points.Count();
                             if (chart == 0) {
-                                charts[chart].Series.Add(leafNode.cumulativeSeries);
+                                Charts[chart].Series.Add(leafNode.cumulativeSeries);
                             }
                             else {
-                                charts[chart].Series.Add(leafNode.monthlySeries);
+                                Charts[chart].Series.Add(leafNode.monthlySeries);
                             }
                         }
                     }
                 }
-                addCheckedSeriesToCharts(node.Nodes);
+                AddCheckedSeriesToCharts(node.Nodes);
             }
         }
 
@@ -133,25 +134,25 @@ namespace InvestmentOptions {
         }
 
         public void handlePropertyChanged(Object sender, EventArgs args) {
-            updateSelf();
+            UpdateSelf();
         }
 
         public void removeAllSeriesFromCharts() {
-            for (int chart = 0; chart < charts.Count; chart++) {
-                charts[chart].Series.Clear();
+            for (int chart = 0; chart < Charts.Count; chart++) {
+                Charts[chart].Series.Clear();
             }
         }
 
-        public void updateDetails() {
+        public void UpdateDetails() {
             //option.treeView.Size = new Size(500, 50); //might be better to make it property of panel,
             ////then pass it to option, to have stuff added to it...
             //Controls.Add(option.treeView);
         }
 
-        public void updateCharts() {
-            option.makeProjection(this);
+        public void UpdateCharts() {
+            option.MakeProjection();
             removeAllSeriesFromCharts();
-            addCheckedSeriesToCharts(option.realWorldTree.Nodes);
+            AddCheckedSeriesToCharts(option.RealWorldTree.Nodes);
             //ITS OK! if refering to dataTree, just put in Option one here... ALL is fine!!!
             //THIS treeView, is only needed for the VIEW!!!
             //Thanks to GETNodePath method, all is ok... or is it? Path might differ slightly...
@@ -161,9 +162,9 @@ namespace InvestmentOptions {
             //as a result, all projections, and and series, should be reset, and then updated.
         }
 
-        public void updateSelf() {
-            updateCharts();
-            updateDetails();
+        public void UpdateSelf() {
+            UpdateCharts();
+            UpdateDetails();
         }
 
     }

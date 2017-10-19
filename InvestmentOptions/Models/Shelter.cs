@@ -24,10 +24,10 @@ namespace InvestmentOptions {
         }
 
         public void resetVariables() {
-            if (option.realWorldTree.property.buyType == Property.BuyType.toLet) {
+            if (option.RealWorldTree.property.buyType == Property.BuyType.toLet) {
                 rent.mv = typicalRent;
             }
-            else if (option.realWorldTree.property.buyType == Property.BuyType.toLiveIn) {
+            else if (option.RealWorldTree.property.buyType == Property.BuyType.toLiveIn) {
                 rent.mv = 0;
             }
             //RESET REST

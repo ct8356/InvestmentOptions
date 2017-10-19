@@ -22,10 +22,10 @@ namespace InvestmentOptions {
             //groupBox.BorderStyle = BorderStyle.FixedSingle;
         }
 
-        public void addCheckBox(MyBoolean myBoolean) {
+        public void addCheckBox(Boolean myBoolean) {
             CheckBox checkBox = new CheckBox();
             Controls.Add(checkBox);
-            checkBox.Name = myBoolean.name;
+            checkBox.Name = myBoolean.Name;
             checkBox.Text = checkBox.Name;
             //foreach (InvestmentOption option in form.optionsList) {
             //  addBinding(checkBox, option.realWorldTree.property.includeWearAndTear);
@@ -53,7 +53,6 @@ namespace InvestmentOptions {
         }
 
         public void addBinding(CheckBox checkBox, Object dataSource) { //data member is the property, to bind.
-            MyBoolean myBoolean = (MyBoolean) dataSource;
             Binding binding = new Binding("Checked", dataSource, "value");
             binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
             checkBox.DataBindings.Add(binding);

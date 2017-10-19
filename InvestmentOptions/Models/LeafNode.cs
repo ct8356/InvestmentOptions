@@ -7,13 +7,12 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace InvestmentOptions {
 
-    public class LeafNode : MyTreeNode {
+    public class LeafNode : TreeNode {
         //later, if decide treeNode is too heavyWeight, to have loads of,
         // just modify this class, to make it more lightWeight...
         //NOTE: Could make this a generic class, to hold floats, and bools...
-        public String Name;
         public bool boolean;
-        public List<bool> showInChartList = new List<bool>();
+        public List<bool> ShowInChartList { get; set; } = new List<bool>();
         public float mv; //monthyValue
         public float mvs; //mv for a single property...
         public float basic;
@@ -25,7 +24,6 @@ namespace InvestmentOptions {
         //List<Node> children; //Not needed now...
 
         public LeafNode() {
-            //Do nothing
         }
 
         public LeafNode(String name) : base(name) {
@@ -36,10 +34,10 @@ namespace InvestmentOptions {
             cumulativeSeries.Name = name;
             Text = name;
             initialiseSeries();
-            showInChartList.Add(false);
-            showInChartList.Add(false);
-            showInChartList.Add(false);
-            showInChartList.Add(false);
+            ShowInChartList.Add(false);
+            ShowInChartList.Add(false);
+            ShowInChartList.Add(false);
+            ShowInChartList.Add(false);
         }
 
         public void initialiseSeries() {
