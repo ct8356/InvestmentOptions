@@ -23,11 +23,11 @@ namespace InvestmentOptions {
             this.option = option;
         }
 
-        public void resetVariables() {
-            if (option.property.buyType == Property.BuyType.toLet) {
+        public void ResetVariables() {
+            if (option.Property.buyType == Property.BuyType.toLet) {
                 rent.mv = typicalRent;
             }
-            else if (option.property.buyType == Property.BuyType.toLiveIn) {
+            else if (option.Property.buyType == Property.BuyType.toLiveIn) {
                 rent.mv = 0;
             }
             //RESET REST

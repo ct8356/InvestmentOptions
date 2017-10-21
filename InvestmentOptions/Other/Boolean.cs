@@ -6,7 +6,9 @@ using System.ComponentModel;
 
 namespace InvestmentOptions {
     public class Boolean : INotifyPropertyChanged {
+
         public String Name { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         bool _value;

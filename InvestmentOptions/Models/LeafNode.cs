@@ -18,21 +18,22 @@ namespace InvestmentOptions {
         public float basic;
         public float higher;
         public float additional;
-        public float cumulativeValue; //NOTE, not enough to set it to zero here.... Do it in RESET!
+        public float cumulativeValue;
         public Series monthlySeries;
         public Series cumulativeSeries;
-        //List<Node> children; //Not needed now...
 
         public LeafNode() {
         }
 
         public LeafNode(String name) : base(name) {
-            monthlySeries = new Series();
-            cumulativeSeries = new Series();
             Name = name;
-            monthlySeries.Name = name;
-            cumulativeSeries.Name = name;
             Text = name;
+            monthlySeries = new Series();
+            monthlySeries.Name = name;
+            cumulativeSeries = new Series(); 
+            cumulativeSeries.Name = name;
+            //Want to get rid of cumSeries,
+            //And just initialise two leafNodes, if need it.
             initialiseSeries();
             ShowInChartList.Add(false);
             ShowInChartList.Add(false);

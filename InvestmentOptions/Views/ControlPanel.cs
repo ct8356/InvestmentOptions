@@ -8,21 +8,21 @@ using System.Drawing;
 namespace InvestmentOptions {
 
     public class ControlPanel : TableLayoutPanel {
-        public ProjectionForm form;
-        public MyCheckedListBox ListBox { get; set; }
-        public MyTreeView realWorldTreeView;
+        public ProjectionForm Form { get; set; }
+        public CheckedListBox ListBox { get; set; }
+        public TreeView realWorldTreeView;
         public GlobalParameters globalParameters;
 
         public ControlPanel(ProjectionForm form) {
-            //CONSTRUCTOR STUFF
-            this.form = form;
+            Form = form;
             //CHILDREN
             globalParameters = new GlobalParameters(form);
-            InvestmentOption dudOption = new InvestmentOption("dud"); //this is the DUD constructor.
-            realWorldTreeView = new MyTreeView(dudOption); //needs to be like this,
-            realWorldTreeView.SetDefaultNodeToChartMapping();
-            //since atm, RWT made inside the option.
-            //needs to be, since each RWT needs an option!
+            InvestmentOption dudOption = new InvestmentOption("dud"); 
+            //this is the DUD constructor.
+            realWorldTreeView = new TreeView(dudOption); 
+            //needs to be like this,
+            //since atm, RWTree made inside the option.
+            //needs to be, since each RWTree needs an option!
             //EXCEPT this one!
             //WELL, this one can have his own dud option!
             realWorldTreeView.ExpandAll();
@@ -42,7 +42,7 @@ namespace InvestmentOptions {
             RowStyles.Add(new RowStyle(SizeType.AutoSize));
             RowStyles.Add(new RowStyle(SizeType.AutoSize));
             RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            Controls.Add(ListBox = new MyCheckedListBox(form));
+            Controls.Add(ListBox = new CheckedListBox(Form));
             Controls.Add(globalParameters);
             Controls.Add(realWorldTreeView);
             //OK MATE! Pretty sure, that tableLayoutPanel is bit lame...

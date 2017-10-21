@@ -59,7 +59,7 @@
     <Compile Include="Models\Life.cs" />
     <Compile Include="Models\Mortgage.cs" />
     <Compile Include="Other\Boolean.cs" />
-    <Compile Include="Views\MyCheckedListBox.cs">
+    <Compile Include="Views\CheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\LeafNode.cs" />
@@ -75,7 +75,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\Property.cs" />
-    <Compile Include="Views\MyTreeView.cs">
+    <Compile Include="Views\TreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\Shelter.cs" />

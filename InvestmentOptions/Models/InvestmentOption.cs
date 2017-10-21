@@ -15,24 +15,30 @@ namespace InvestmentOptions {
         //BUT MAYBE, but treeView above this one?
         //NEED TO SHRINK THIS FILE!
         //NEEDS TIDYING UP OF FIELDS! REVISIT
+
         //TREENODES
-        public Job job;
-        public Life life;
-        public Mortgage mortgage;
-        public Property property;
-        public Shelter shelter;
+        public Job Job { get; set; }
+        public Life Life { get; set; }
+        public Mortgage Mortgage { get; set; }
+        public Property Property { get; set; }
+        public Shelter Shelter { get; set; }
         //OTHER NODES (WITH SERIES)
-        public LeafNode bankAccount;
-        public LeafNode netWorth;
-        public LeafNode ingoings;
-        public LeafNode outgoings;
+        //NOTE: these other nodes need definitions of
+        //how to behave.
+        //behaviour for each is different,
+        //SO its best to create a class for each one!
+        public LeafNode BankAccount { get; set; }
+        public LeafNode NetWorth { get; set; }
+        public LeafNode Ingoings { get; set; }
+        public LeafNode Outgoings { get; set; }
         public bool showInPanel = false;
         public bool zeroInvestment = false;
         public bool noMortgageNeeded = false;
         public List<Boolean> booleans;
         public static Boolean countRentSavingsAsIncome = new Boolean("countRentSavingsAsIncome");
         public Boolean autoInvest = new Boolean("autoInvest");
-        //NOTE: must be a better way of doing this... Not sure I even like Bindings. Not much simpler.
+        //NOTE: must be a better way of doing this... 
+        //Not sure I even like Bindings. Not much simpler.
         public int years = 10;
         public int intervals; //(interval is one month).
         //List<String> keyList = new List<String>();
@@ -41,15 +47,19 @@ namespace InvestmentOptions {
         //INGOINGS
         //Floats and ints fine into millions. Be careful when reach billions.
         public float bankInterest;
-        public float bankInterestRate = 0.000f; //0, since bIR only covers inflation, not accounted for here.
-        //a struct or union may be better for grouping living costs, but for now, we'll just use a class
+        public float bankInterestRate = 0.000f;
+        //0, since bIR only covers inflation, not accounted for here.
+        //a struct or union may be better for grouping living costs, 
+        //but for now, we'll just use a class
         public float incomeTaxRate = 0.20f;
-        //public Dictionary<String, LeafNode> nodeDictionary = new Dictionary<String, LeafNode>();
+        //public Dictionary<String, LeafNode> nodeDictionary;
         //public List<LeafNode> nodeList = new List<LeafNode>();
         //public MyTreeView treeView;
-        public MyTreeView RealWorldTree { get; set; }
-        //interesting alternative to above, might be one class, with a load of nested-classes...
-        //BUT I think the above is best way... want the ONLY relationship defined, to be defined by the TREE.
+        public new TreeView TreeView { get; set; }
+        //interesting alternative to above, 
+        //might be one class, with a load of nested-classes...
+        //BUT I think the above is best way... 
+        //want the ONLY relationship defined, to be defined by the TREE.
 
         public InvestmentOption(String name) : base(name) {
             Name = name;
@@ -63,20 +73,24 @@ namespace InvestmentOptions {
         }
 
         public InvestmentOption(String name, ProjectionForm form) : this(name) {
-            RealWorldTree = new MyTreeView(form.controlPanel, this);
+            TreeView = new TreeView(form.controlPanel, this);
+            // REVISIT not quite right.
         }
 
         public void AddChildren()
         {
-            Nodes.Add(job = new Job(this));
-            Nodes.Add(life = new Life(this));
-            Nodes.Add(mortgage = new Mortgage(this));
-            Nodes.Add(property = new Property(this));
-            Nodes.Add(shelter = new Shelter(this));
-            Nodes.Add(bankAccount = new LeafNode("bankAccount"));
-            Nodes.Add(netWorth = new LeafNode("netWorth"));
-            Nodes.Add(ingoings = new LeafNode("ingoings"));
-            Nodes.Add(outgoings = new LeafNode("outgoings"));
+            Nodes.Add(Job = new Job(this));
+            Nodes.Add(Life = new Life(this));
+            Nodes.Add(Mortgage = new Mortgage(this));
+            Nodes.Add(Property = new Property(this));
+            Nodes.Add(Shelter = new Shelter(this));
+            //Shelter.rent.showInChartList[1] = true;
+            Nodes.Add(BankAccount = new LeafNode("bankAccount"));
+            BankAccount.ShowInChartList[0] = true;
+            Nodes.Add(NetWorth = new LeafNode("netWorth"));
+            NetWorth.ShowInChartList[0] = true;
+            Nodes.Add(Ingoings = new LeafNode("ingoings"));
+            Nodes.Add(Outgoings = new LeafNode("outgoings"));
         }
 
         //public void initialiseTree() {
@@ -100,53 +114,58 @@ namespace InvestmentOptions {
         //}
 
         public void Invest() {
-            if (bankAccount.mv > mortgage.deposit) {
+            if (BankAccount.mv > Mortgage.deposit) {
                 //invest
-                mortgage.moneyBorrowed += property.price - mortgage.deposit; // not that important.
-                mortgage.moneyOwed += property.housePrice - mortgage.deposit;
-                bankAccount.mv -= mortgage.deposit;
-                property.moneyInvested += mortgage.deposit;
+                Mortgage.moneyBorrowed += Property.price - Mortgage.deposit; // not that important.
+                Mortgage.moneyOwed += Property.housePrice - Mortgage.deposit;
+                BankAccount.mv -= Mortgage.deposit;
+                Property.moneyInvested += Mortgage.deposit;
                 //Benefits
-                property.buyNewProperty();
+                Property.buyNewProperty();
             } //something you forgetting to update. what is it? YES the extra features that make you money!
         }
 
         public void CalculateCumulativeValues() {
-            bankAccount.cumulativeValue = bankAccount.mv;
-            netWorth.cumulativeValue = netWorth.mv;
-            ingoings.cumulativeValue += ingoings.mv;
-            job.ingoings.cumulativeValue += job.ingoings.mv;
-            property.ingoings.cumulativeValue += property.tenantsRent.mv -
-                property.incomeTax.mv;
-            outgoings.cumulativeValue += outgoings.mv;
-            shelter.outgoings.cumulativeValue += shelter.houseCosts.mv;
-            life.outgoings.cumulativeValue += life.costs.mv;
-            property.outgoings.cumulativeValue += property.outgoings.mv;
-            mortgage.repayment.cumulativeValue += mortgage.repayment.mv;
-            mortgage.interest.cumulativeValue += mortgage.interest.mv;
-            mortgage.payment.cumulativeValue = mortgage.payment.mv;
-            property.wearAndTear.cumulativeValue += property.wearAndTear.mv;
-            property.agentsFee.cumulativeValue += property.agentsFee.mv;
-            property.accountantsFee.cumulativeValue += property.accountantsFee.mv;
-            property.incomeTax.cumulativeValue += property.incomeTax.mv;
-            job.studentLoanRepayments.cumulativeValue += job.studentLoanRepayments.mv;
-            //realWorldTree.property.capitalGains.cumulativeValue += realWorldTree.job.student
-        }//Note, this can easily be done in own nodes... easier with events? or method waterfall?
-        //either way, the method needs to be called by something... (by the delegate, or by the upper method).
-        //NOTE: I might suggest, avoid using events unless really have to? i.e. registering with event of unmodifiable class?
-        //AHAH! real question is, is it easier for you, to define the link in object, or in the parent???
-        //WHATEVER! NEED to do something about this!!!
-
-        public void calculateIngoings() {
-            //just have to make sure all equations are well defined here...
-            bankInterest = bankAccount.mv * bankInterestRate; //Monthly interest...     
-            ingoings.mv = job.ingoings.mv + bankInterest + property.tenantsRent.mv -
-                property.incomeTax.mv;
+            BankAccount.cumulativeValue = BankAccount.mv;
+            NetWorth.cumulativeValue = NetWorth.mv;
+            Ingoings.cumulativeValue += Ingoings.mv;
+            Job.ingoings.cumulativeValue += Job.ingoings.mv;
+            Property.ingoings.cumulativeValue += Property.tenantsRent.mv -
+                Property.incomeTax.mv;
+            Outgoings.cumulativeValue += Outgoings.mv;
+            Shelter.outgoings.cumulativeValue += Shelter.houseCosts.mv;
+            Life.outgoings.cumulativeValue += Life.costs.mv;
+            Property.outgoings.cumulativeValue += Property.outgoings.mv;
+            Mortgage.repayment.cumulativeValue += Mortgage.repayment.mv;
+            Mortgage.interest.cumulativeValue += Mortgage.interest.mv;
+            Mortgage.payment.cumulativeValue = Mortgage.payment.mv;
+            Property.wearAndTear.cumulativeValue += Property.wearAndTear.mv;
+            Property.agentsFee.cumulativeValue += Property.agentsFee.mv;
+            Property.accountantsFee.cumulativeValue += Property.accountantsFee.mv;
+            Property.incomeTax.cumulativeValue += Property.incomeTax.mv;
+            Job.studentLoanRepayments.cumulativeValue += Job.studentLoanRepayments.mv;
+            //property.capitalGains.cumulativeValue += job.student
+            //Note, this can easily be done in own nodes.
+            //easier with events? or method waterfall?
+            //either way, the method needs to be called by something.
+            //(by the delegate, or by the upper method).
+            //NOTE: I might suggest, avoid using events unless really have to? 
+            //i.e. registering with event of unmodifiable class?
+            //AHAH! real question is, is it easier for you, 
+            //to define the link in object or in the parent???
+            //WHATEVER! NEED to do something about this!!!
         }
 
-        public void calculateOutgoings() {
-            shelter.houseCosts.mv = shelter.rent.mv + shelter.houseBills.mv + shelter.councilTax.mv;
-            outgoings.mv = shelter.houseCosts.mv + life.costs.mv + property.outgoings.mv;
+        public void CalculateIngoings() {
+            //just have to make sure all equations are well defined here...
+            bankInterest = BankAccount.mv * bankInterestRate; //Monthly interest...     
+            Ingoings.mv = Job.ingoings.mv + bankInterest + Property.tenantsRent.mv -
+                Property.incomeTax.mv;
+        }
+
+        public void CalculateOutgoings() {
+            Shelter.houseCosts.mv = Shelter.rent.mv + Shelter.houseBills.mv + Shelter.councilTax.mv;
+            Outgoings.mv = Shelter.houseCosts.mv + Life.costs.mv + Property.outgoings.mv;
         }
 
         //public void initialiseKeyList() {
@@ -184,45 +203,44 @@ namespace InvestmentOptions {
 
         public void MakeProjection() {
             ResetVariables();
-            ResetRealWorldTree();
+            ResetTreeView();
             for (int interval = 0; interval < intervals; interval++) {
-                //calculations:
-                mortgage.calculateMortgagePayments(intervals);
-                property.updateVariables();
-                calculateIngoings();
-                calculateOutgoings();
-                bankAccount.mv += ingoings.mv - outgoings.mv;
-                netWorth.mv += ingoings.mv - outgoings.mv +
-                    mortgage.repayment.mv + property.capitalGainsProfit.mv;
+                //Calculations:
+                Mortgage.calculateMortgagePayments(intervals);
+                Property.updateVariables();
+                CalculateIngoings();
+                CalculateOutgoings();
+                BankAccount.mv += Ingoings.mv - Outgoings.mv;
+                NetWorth.mv += Ingoings.mv - Outgoings.mv +
+                    Mortgage.repayment.mv + Property.capitalGainsProfit.mv;
                 //STORE TOTALS
                 CalculateCumulativeValues();
                 //UPDATE SERIES RECURSIVELY
-                RealWorldTree.UpdateSeries(RealWorldTree.Nodes);
+                TreeView.UpdateSeries(TreeView.Nodes);
                 //LOGIC
                 if (autoInvest.Value)
                     Invest();
             }
         }
 
-        public void ResetRealWorldTree() {
-            RealWorldTree.ResetTree(RealWorldTree.Nodes);
+        public void ResetTreeView() {
+            TreeView.ResetTree(TreeView.Nodes);
         }
 
         public void ResetVariables() {
-            property.resetIndependentVariables();
-            mortgage.resetVariables();
-            job.resetVariables();
-            shelter.resetVariables();
-            //Option specific stuff:
-            bankAccount.mv = 0;
-            bankAccount.cumulativeValue = 0;
-            netWorth.mv = bankAccount.mv + property.propertyCount * mortgage.deposit;
-            netWorth.cumulativeValue = netWorth.mv;
+            Property.ResetIndependentVariables();
+            Mortgage.resetVariables();
+            Job.resetVariables();
+            Shelter.ResetVariables();
+            //Option specific stuff
+            BankAccount.mv = 0;
+            BankAccount.cumulativeValue = 0;
+            NetWorth.mv = BankAccount.mv + Property.propertyCount * Mortgage.deposit;
+            NetWorth.cumulativeValue = NetWorth.mv;
         }
 
         public override String ToString() {
-            String name = Name;
-            return name;
+            return Name;
         }
 
         public void WriteLine(String name, float value) {

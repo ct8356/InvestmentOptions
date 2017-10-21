@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using System.ComponentModel; //yeah, because this is now the model for a component! A viewModel!
+using System.ComponentModel;
 
 namespace InvestmentOptions {
     public class Property : BranchNode, INotifyPropertyChanged {
-        //NOTE: You can express which LEAFNODES are DEPENDENT, and INDEPENDENT, with private and public!
+        //NOTE: You can express which LEAFNODES are DEPENDENT, and INDEPENDENT,
+        //with private and public!
         //or setters, vs no setters!!!
         public event PropertyChangedEventHandler PropertyChanged;
         public float price;
@@ -62,17 +63,29 @@ namespace InvestmentOptions {
         public Property(InvestmentOption option) : base("property") {
             Nodes.Add(ingoings = new LeafNode("propertyingoings"));
             Nodes.Add(tenantCount = new LeafNode("tenantCount"));
+            tenantCount.ShowInChartList[3] = true;
             Nodes.Add(tenantsRent = new LeafNode("tenantsRent"));
+            tenantsRent.ShowInChartList[1] = true;
             Nodes.Add(taxableTenantsRent = new LeafNode("taxableTenantsRent"));
+            taxableTenantsRent.ShowInChartList[1] = true;
             Nodes.Add(outgoings = new LeafNode("propertyoutgoings"));
             Nodes.Add(costs = new LeafNode("propertycosts"));
+            costs.ShowInChartList[1] = true;
             Nodes.Add(wearAndTear = new LeafNode("wearAndTear"));
+            wearAndTear.ShowInChartList[2] = true;
             Nodes.Add(agentsFee = new LeafNode("agentsFee"));
+            agentsFee.ShowInChartList[2] = true;
             Nodes.Add(accountantsFee = new LeafNode("accountantsFee"));
+            accountantsFee.ShowInChartList[2] = true;
             Nodes.Add(profitAndSavings = new LeafNode("propertyProfitAndSavings"));
+            profitAndSavings.ShowInChartList[1] = true;
             Nodes.Add(taxableProfit = new LeafNode("taxableProfit"));
-            Nodes.Add(incomeTax = new LeafNode("incomeTax")); //BOOM,instant'g and assign'g same time!
+            taxableProfit.ShowInChartList[1] = true;
+            Nodes.Add(incomeTax = new LeafNode("incomeTax")); 
+            //BOOM,instant'g and assign'g same time!
+            incomeTax.ShowInChartList[1] = true;
             Nodes.Add(returnOnInvestment = new LeafNode("returnOnInvestment"));
+            returnOnInvestment.ShowInChartList[3] = true;
             Nodes.Add(capitalGains = new LeafNode("capitalGains"));
             capitalGains.ShowInChartList[0] = true;
             //SO, value, should not be a float, should be an object...
@@ -118,8 +131,8 @@ namespace InvestmentOptions {
 
         public void calculatePropertyOutgoings() {
             outgoings.mv = agentsFee.mv + wearAndTear.mv + buildingsInsurance +
-                accountantsFee.mv + option.mortgage.interest.mv +
-                option.mortgage.repayment.mv;
+                accountantsFee.mv + option.Mortgage.interest.mv +
+                option.Mortgage.repayment.mv;
         }
 
         public void calculateCapitalGainsProfit() {
@@ -169,11 +182,11 @@ namespace InvestmentOptions {
             taxableTenantsRent.mv = tenantsRent.mv;
             calculatePropertyOutgoings();
             taxableProfit.mv = taxableTenantsRent.mv -
-                (outgoings.mv - option.mortgage.repayment.mv);
+                (outgoings.mv - option.Mortgage.repayment.mv);
             rentSavings.mv = 0;
             switch (buyType) {
-                case Property.BuyType.toLiveIn: //Buy to live in
-                    rentSavings.mv = option.shelter.typicalRent;
+                case BuyType.toLiveIn: //Buy to live in
+                    rentSavings.mv = option.Shelter.typicalRent;
                     if (rentARoomScheme.Value) {
                         taxableTenantsRent.mv = tenantsRent.mv - 4250 / 12;
                         //if (taxableTenantsRent.mv < 0) taxableTenantsRent.mv = 0;
@@ -185,7 +198,7 @@ namespace InvestmentOptions {
                     //calculated here, because if use it, CANNOT claim back tax on your letting expenses!
                     //As gen rule, if expenses are LESS than £4250, then rent room scheme is better for you.
                     break;
-                case Property.BuyType.toLet: //Buy to let
+                case BuyType.toLet: //Buy to let
                     //do nothing
                     break;
             }
@@ -195,7 +208,7 @@ namespace InvestmentOptions {
             profitAndSavings.mv = taxableProfit.mv - incomeTax.mv + rentSavings.mv;
             if (option.zeroInvestment) {
                 profitAndSavings.mv = 
-                    option.mortgage.repayment.cumulativeValue * option.mortgage.interestRate; 
+                    option.Mortgage.repayment.cumulativeValue * option.Mortgage.interestRate; 
             }
         }
 
@@ -206,14 +219,14 @@ namespace InvestmentOptions {
             taxableCapitalGainsHigher.cumulativeValue = 0;
         }
 
-        public void resetIndependentVariables() {
+        public void ResetIndependentVariables() {
             //RESET PROPERTY COUNT AND TENANT COUNT
             originalBedroomCount = bedroomsPerHouse;
             propertyCount = originalPropertyCount;
-            if (buyType == Property.BuyType.toLet) {
+            if (buyType == BuyType.toLet) {
                 originalTenantCount = originalBedroomCount * originalPropertyCount;
             }
-            else if (buyType == Property.BuyType.toLiveIn) {
+            else if (buyType == BuyType.toLiveIn) {
                 originalTenantCount = originalBedroomCount * originalPropertyCount - 1;
             }
             if (option.zeroInvestment) {
@@ -222,7 +235,7 @@ namespace InvestmentOptions {
             }
             //RESET REST
             tenantCount.mv = originalTenantCount;
-            moneyInvested = propertyCount * option.mortgage.deposit;
+            moneyInvested = propertyCount * option.Mortgage.deposit;
             if (option.zeroInvestment) {
                 moneyInvested = 0;
             }
@@ -241,7 +254,7 @@ namespace InvestmentOptions {
             }
             agentsFee.mv = 0;
             wearAndTear.mv = propertyCount * 0;
-            if (Property.includeWearAndTear.Value) {
+            if (includeWearAndTear.Value) {
                 agentsFee.mv = tenantsRent.mv * 0.15f;
                 wearAndTear.mv = propertyCount * 90; //now, that's fairer.
             }
@@ -251,11 +264,11 @@ namespace InvestmentOptions {
 
         public void updateVariables() {
             calculatePropertyIncomeTax();
-            costs.mv = outgoings.mv - option.mortgage.repayment.mv;
+            costs.mv = outgoings.mv - option.Mortgage.repayment.mv;
             if (option.zeroInvestment) {
                 costs.mv = 0;
             }
-            moneyInvested += option.mortgage.repayment.mv;
+            moneyInvested += option.Mortgage.repayment.mv;
             returnOnInvestment.mv = 12 * profitAndSavings.mv / moneyInvested * 100;
             calculateCapitalGainsProfit();
             housePrice = housePrice * (1 + percentageGrowth);

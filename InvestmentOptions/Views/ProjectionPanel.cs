@@ -10,27 +10,26 @@ using System.Windows.Forms.DataVisualization.Charting;
 namespace InvestmentOptions {
 
     public class ProjectionPanel : FlowLayoutPanel {
-        public InvestmentOption option;
-        public List<LeafNode> nodeList;
-        private List<Chart> Charts { get; set; } = new List<Chart>();
+        public InvestmentOption Option { get; set; }
         public ProjectionForm Form { get; set; }
-        public FlowLayoutPanel optionsPanel;
+        public FlowLayoutPanel OptionsPanel { get; set; }
+        private List<Chart> Charts { get; set; } = new List<Chart>();
         //public delegate void PropertyChangedEventHandler();
 
         public ProjectionPanel(InvestmentOption option, ProjectionForm form) {
+            Option = option;
             Form = form;
             //PANEL STUFF
-            Text = "Christiaan Panel";
+            Text = Option.Name;
             FlowDirection = FlowDirection.TopDown;
             //OTHER
-            this.option = option;
             InitialiseChildren();
             BorderStyle = BorderStyle.FixedSingle;
             //SUBCRIBE TO EVENTS (of the static booleans).
             InvestmentOption.countRentSavingsAsIncome.PropertyChanged += 
-                new PropertyChangedEventHandler(handlePropertyChanged);
+                new PropertyChangedEventHandler(HandlePropertyChanged);
             Property.includeWearAndTear.PropertyChanged += 
-                new PropertyChangedEventHandler(handlePropertyChanged);
+                new PropertyChangedEventHandler(HandlePropertyChanged);
         }
 
         private void InitialiseChildren() {
@@ -40,7 +39,7 @@ namespace InvestmentOptions {
             Charts.Add(new Chart());
             Charts.Add(new Chart());
             //SETUP OPTIONS
-            initialiseOptionsPanel();
+            InitialiseOptionsPanel();
             //SETUP CHARTS
             InitialiseChart(Charts[0]);
             Charts[0].ChartAreas[0].AxisY.Maximum = 140000;
@@ -66,37 +65,40 @@ namespace InvestmentOptions {
             chart.Text = "chart1";
             Controls.Add(chart);
             Title title1 = new Title
-                (option.Name, Docking.Top, new Font("Verdana", 12), Color.Black);
+                (Option.Name, Docking.Top, new Font("Verdana", 12), Color.Black);
             //chart.Titles.Add(title1);
             chart.Legends.Add(legend);
         }
 
-        public void initialiseOptionsPanel() {
-            optionsPanel = new FlowLayoutPanel();
-            optionsPanel.BorderStyle = BorderStyle.FixedSingle;
-            optionsPanel.FlowDirection = FlowDirection.LeftToRight;
-            optionsPanel.Dock = DockStyle.Top;
-            optionsPanel.Height = 60;
-            Controls.Add(optionsPanel);
-            addCheckBox(option.property.rentARoomScheme);
-            addCheckBox(option.autoInvest);
-            addLabel(option.property.buyType.ToString());
-            addLabel(option.mortgage.type.ToString());
-            addLabel(option.property.location.ToString());
-            addLabel("BdRms/Hse: " + option.property.bedroomsPerHouse);
+        public void InitialiseOptionsPanel() {
+            OptionsPanel = new FlowLayoutPanel();
+            OptionsPanel.BorderStyle = BorderStyle.FixedSingle;
+            OptionsPanel.FlowDirection = FlowDirection.LeftToRight;
+            OptionsPanel.Dock = DockStyle.Top;
+            OptionsPanel.Height = 60;
+            Controls.Add(OptionsPanel);
+            AddCheckBox(Option.Property.rentARoomScheme);
+            AddCheckBox(Option.autoInvest);
+            addLabel(Option.Property.buyType.ToString());
+            addLabel(Option.Mortgage.type.ToString());
+            addLabel(Option.Property.location.ToString());
+            addLabel("BdRms/Hse: " + Option.Property.bedroomsPerHouse);
         }
 
-        public void addCheckBox(Object dataSource) { //data member is the property, to bind.
-            Boolean myBoolean = (Boolean)dataSource;
-            CheckBox checkBox = new CheckBox();
-            optionsPanel.Controls.Add(checkBox);
+        private void AddCheckBox(Boolean myBoolean) { 
+            //myBoolean is dataSource.
+            //data member is the property, to bind.
+            //CHECK BOX
+            CheckBox checkBox = new CheckBox();    
             checkBox.Name = myBoolean.Name;
-            checkBox.Text = checkBox.Name;
-            Binding binding = new Binding("Checked", dataSource, "value");
+            checkBox.Text = myBoolean.Name;
+            OptionsPanel.Controls.Add(checkBox);
+            //BINDING
+            Binding binding = new Binding("Checked", myBoolean, "value");
             binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
             checkBox.DataBindings.Add(binding);
-            //SUBSCRIBE TO ITS EVENTS
-            myBoolean.PropertyChanged += new PropertyChangedEventHandler(handlePropertyChanged);
+            //SUBSCRIBE
+            myBoolean.PropertyChanged += HandlePropertyChanged;
         }
 
         public void AddCheckedSeriesToCharts(TreeNodeCollection nodes) {
@@ -128,12 +130,12 @@ namespace InvestmentOptions {
 
         public void addLabel(String dataSource) {
             Label label = new Label();
-            optionsPanel.Controls.Add(label);
+            OptionsPanel.Controls.Add(label);
             label.Name = dataSource;
             label.Text = label.Name;
         }
 
-        public void handlePropertyChanged(Object sender, EventArgs args) {
+        public void HandlePropertyChanged(Object sender, EventArgs args) {
             UpdateSelf();
         }
 
@@ -143,16 +145,10 @@ namespace InvestmentOptions {
             }
         }
 
-        public void UpdateDetails() {
-            //option.treeView.Size = new Size(500, 50); //might be better to make it property of panel,
-            ////then pass it to option, to have stuff added to it...
-            //Controls.Add(option.treeView);
-        }
-
         public void UpdateCharts() {
-            option.MakeProjection();
+            Option.MakeProjection();
             removeAllSeriesFromCharts();
-            AddCheckedSeriesToCharts(option.RealWorldTree.Nodes);
+            AddCheckedSeriesToCharts(Option.TreeView.Nodes);
             //ITS OK! if refering to dataTree, just put in Option one here... ALL is fine!!!
             //THIS treeView, is only needed for the VIEW!!!
             //Thanks to GETNodePath method, all is ok... or is it? Path might differ slightly...
@@ -164,7 +160,6 @@ namespace InvestmentOptions {
 
         public void UpdateSelf() {
             UpdateCharts();
-            UpdateDetails();
         }
 
     }

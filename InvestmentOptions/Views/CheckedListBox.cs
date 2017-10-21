@@ -6,13 +6,13 @@ using System.Windows.Forms;
 
 namespace InvestmentOptions {
 
-    public class MyCheckedListBox : CheckedListBox {
+    public class CheckedListBox : System.Windows.Forms.CheckedListBox {
         //Solutions in binding a datasource to a CheckedListBox aren't very elegant. 
         //Use a DataGridView with a Checkbox column instead.
         ProjectionForm form;
         public int checkedItemsCount = 0;
 
-        public MyCheckedListBox(ProjectionForm form) {
+        public CheckedListBox(ProjectionForm form) {
             this.form = form;
             Dock = DockStyle.Fill;
             //Width = Parent.Width;

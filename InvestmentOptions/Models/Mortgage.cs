@@ -23,6 +23,7 @@ namespace InvestmentOptions {
         public Mortgage(InvestmentOption option) : base("mortgage") {
             Nodes.Add(repayment = new LeafNode("mortgageRepayment"));
             Nodes.Add(interest = new LeafNode("mortgageinterest"));
+            interest.ShowInChartList[2] = true;
             Nodes.Add(payment = new LeafNode("mortgagePayment"));
             Nodes.Add(debtReduced = new LeafNode("debtReduced"));
             this.option = option;
@@ -53,9 +54,9 @@ namespace InvestmentOptions {
 
         public void resetVariables() {
             moneyBorrowed = 
-                option.property.originalPropertyCount * (option.property.housePrice - deposit);
+                option.Property.originalPropertyCount * (option.Property.housePrice - deposit);
             if (option.noMortgageNeeded) {
-                option.property.moneyInvested = option.property.originalHousePrice;
+                option.Property.moneyInvested = option.Property.originalHousePrice;
                 moneyBorrowed = 0;
             }
             moneyOwed = moneyBorrowed;

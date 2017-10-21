@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Windows.Forms.VisualStyles;
 
 namespace InvestmentOptions {
-    public class MyTreeView : TreeView {
+    public class TreeView : System.Windows.Forms.TreeView {
         //NOTE: A TreeView HAS to have an InvestmentOption as a property.
         //Since its childNodes (for the moment) need access to an InvestmentOption... 
         //(for int intervals)..
@@ -15,7 +15,7 @@ namespace InvestmentOptions {
         public ControlPanel ControlPanel { get; set; }
         private Size GlyphSize { get; set; } = Size.Empty;
 
-        public MyTreeView(InvestmentOption option) {
+        public TreeView(InvestmentOption option) {
             Option = option;
             Option.AddChildren();
             AddChildren();
@@ -32,7 +32,7 @@ namespace InvestmentOptions {
             NodeMouseClick += new TreeNodeMouseClickEventHandler(UpdateShowInChartList);
         }
 
-        public MyTreeView(ControlPanel controlPanel, InvestmentOption option)
+        public TreeView(ControlPanel controlPanel, InvestmentOption option)
             : this(option) {
             //THIS is for OPTION Trees!
             ControlPanel = controlPanel;
@@ -105,7 +105,7 @@ namespace InvestmentOptions {
             foreach (TreeNode node in nodes) {
                 if (node is LeafNode) {
                     LeafNode leafNode = (LeafNode)node;
-                    Binding binding = new Binding("Checked", Option.property, "rentARoomScheme");
+                    Binding binding = new Binding("Checked", Option.Property, "rentARoomScheme");
                     binding.DataSourceUpdateMode = DataSourceUpdateMode.OnPropertyChanged;
                     ControlPanel.realWorldTreeView.DataBindings.Add(binding); 
                 }
@@ -154,7 +154,8 @@ namespace InvestmentOptions {
                     return foundNode; //if found a match, your are done... keep sending it back up a level.
             }//If has no children, AND/OR no treeNode returned, then try next node...
             return null; //nothing ever found on that layer, return null...
-        } //NOTE: Slow, because checks EVERY NODE, rather than following path. OK for now...
+        } 
+        //NOTE: Slow, because checks EVERY NODE, rather than following path. OK for now...
         
         public void LabelTree(TreeNodeCollection nodes) {
             foreach (LeafNode node in nodes) {
@@ -165,8 +166,7 @@ namespace InvestmentOptions {
 
         public void ResetTree(TreeNodeCollection nodes) {
             foreach (TreeNode node in nodes) {
-                if (node is LeafNode) {
-                    LeafNode leafNode = (LeafNode)node;
+                if (node is LeafNode leafNode) {
                     leafNode.monthlySeries.Points.Clear();
                     leafNode.cumulativeSeries.Points.Clear();
                 }
@@ -174,31 +174,9 @@ namespace InvestmentOptions {
             }
         }
 
-        public void SetDefaultNodeToChartMapping() {
-            Option.bankAccount.ShowInChartList[0] = true;
-            Option.netWorth.ShowInChartList[0] = true;
-            Option.property.taxableTenantsRent.ShowInChartList[1] = true;
-            Option.property.tenantsRent.ShowInChartList[1] = true;
-            Option.property.profitAndSavings.ShowInChartList[1] = true;
-            Option.property.taxableProfit.ShowInChartList[1] = true;
-            Option.property.costs.ShowInChartList[1] = true;
-            Option.property.taxableTenantsRent.ShowInChartList[1] = true;
-            Option.property.incomeTax.ShowInChartList[1] = true;
-            //shelter.rent.showInChartList[1] = true;
-            Option.mortgage.interest.ShowInChartList[2] = true;
-            Option.property.wearAndTear.ShowInChartList[2] = true;
-            Option.property.agentsFee.ShowInChartList[2] = true;
-            Option.property.accountantsFee.ShowInChartList[2] = true;
-            Option.property.returnOnInvestment.ShowInChartList[3] = true;
-            Option.property.tenantCount.ShowInChartList[3] = true;
-            //NOTE: Should really just do this, where the these Nodes belong...
-            //otherwise, this list gets REAL messy...
-        }
-
         public void UpdateSeries(TreeNodeCollection nodes) {
             foreach (TreeNode node in nodes) {
-                if (node is LeafNode) {
-                    LeafNode leafNode = (LeafNode) node;
+                if (node is LeafNode leafNode) {
                         leafNode.cumulativeSeries.Points.AddY(leafNode.cumulativeValue);
                         leafNode.cumulativeSeries.LegendText =
                             leafNode.cumulativeSeries.Name + " £" + String.Format("{0:n}", leafNode.cumulativeValue);
@@ -213,16 +191,15 @@ namespace InvestmentOptions {
         public void UpdateShowInChartList(Object sender, TreeNodeMouseClickEventArgs e){          
             if (e == null)
                 return;
-            HandleTreeNode(e.Node as TreeNode, e); //viewNode
-        }
-
-        public void HandleTreeNode(TreeNode treeNode, TreeNodeMouseClickEventArgs e) {
-            if (treeNode is LeafNode) {
-                LeafNode leafNode = (LeafNode) treeNode;
+            if (e.Node is LeafNode leafNode)
+            {
+                //If clicked checkBox 0
                 if (GetCheckBoxRectangle(leafNode.Bounds, 0).Contains(e.Location))
                     leafNode.ShowInChartList[0] = !leafNode.ShowInChartList[0];
+                //If clicked checkBox 1
                 else if (GetCheckBoxRectangle(leafNode.Bounds, 1).Contains(e.Location))
                     leafNode.ShowInChartList[1] = !leafNode.ShowInChartList[1];
+                //Of clicked checkBox 2
                 else if (GetCheckBoxRectangle(leafNode.Bounds, 2).Contains(e.Location))
                     leafNode.ShowInChartList[2] = !leafNode.ShowInChartList[2];
                 Invalidate();
