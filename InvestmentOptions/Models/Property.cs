@@ -13,7 +13,7 @@ namespace InvestmentOptions {
         public enum BuyType { toLiveIn, toLet }; //buyToLive or buyToLet
         public BuyType buyType;
         public enum Location { Nottingham, London };
-        public Location location = Location.Nottingham;
+        public Location location { get; set; } = Location.Nottingham;
         public Boolean rentARoomScheme = new Boolean("rentARoomScheme");
         public static Boolean includeWearAndTear = new Boolean("includeWearAndTear");
         public LeafNode IncomeTax
@@ -82,7 +82,7 @@ namespace InvestmentOptions {
                     { mv = 0 };
 
             }
-            
+
         }
         //Not really worth it! That's 8-10 hours a month! That is easy. (or is it?)
         //No, not easy, BUT won't take that much time in reality (or will it? per tenant?).
@@ -116,7 +116,21 @@ namespace InvestmentOptions {
                 { mv = 9 * PropertyCount }; //9 pounds
             }
         }
-        public LeafNode profitAndSavings;
+        public LeafNode profitAndSavings
+        {
+            get
+            {
+                if (Option.zeroInvestment)
+                    return new LeafNode("profitAndSavings")
+                    {
+                        mv = Option.Mortgage.repayment.cumulativeValue *
+                        Option.Mortgage.interestRate
+                    };
+                else
+                    return new LeafNode("profitAndSavings")
+                    { mv = TaxableProfit.mv - IncomeTax.mv + RentSavings.mv };
+            }
+        }
         public LeafNode TaxableProfit
         {
             get
@@ -132,10 +146,27 @@ namespace InvestmentOptions {
                 //As gen rule, if expenses are LESS than £4250, then rent room scheme is better for you.
             }
         }
-        public LeafNode returnOnInvestment;
-        public LeafNode costs;
+        public LeafNode ReturnOnInvestment
+        {
+            get
+            {
+                return new LeafNode("returnOnInvestment")
+                { mv = 12 * profitAndSavings.mv / moneyInvested * 100 };
+            }
+        }
+        public LeafNode Costs
+        {
+            get {
+                if (Option.zeroInvestment)
+                    return new LeafNode("costs")
+                    { mv = 0 };
+                else
+                    return new LeafNode("costs")
+                    { mv = Outgoings.mv - Option.Mortgage.repayment.mv };
+            }
+        }
         public LeafNode TaxableTenantsRent
-        { 
+        {
             get
             {
                 if (buyType == BuyType.toLiveIn && rentARoomScheme.Value)
@@ -148,15 +179,118 @@ namespace InvestmentOptions {
                 else return TenantsRent;
             }
         }
-        public LeafNode capitalGains;
-        public LeafNode taxableCapitalGains;
-        public LeafNode taxableCapitalGainsBasic;
-        public LeafNode taxableCapitalGainsHigher;
+        public LeafNode CapitalGains
+        {
+            get
+            {
+                return new LeafNode("capitalGains")
+                {
+                    mvs = housePrice * PercentageGrowth,
+                    mv = PropertyCount * housePrice * PercentageGrowth,
+                };
+            }
+        }
+        public LeafNode TaxableCapitalGains
+        {
+            get
+            {
+                return new LeafNode("taxableCapitalGains")
+                {
+                    mvs = CapitalGains.mvs - capitalGainsAllowance / Option.Intervals,
+                    mv = PropertyCount * CapitalGains.mvs - capitalGainsAllowance / Option.Intervals,
+                };
+            }
+        }
+        public LeafNode BasicTaxableCapitalGains {
+            get
+            {
+                //NOW remember, selling one house each year!!! THATS WHY got the mvs below...
+                if (TaxableCapitalGains.mvs < BasicAllowableCapitalGains.mv)
+                    return new LeafNode("BasicTaxableCapitalGains")
+                    { mv = TaxableCapitalGains.mvs };
+                else
+                    //it gets more complicated
+                    //pay 28% on any amount above this...
+                    return new LeafNode("BasicTaxableCapitalGains")
+                    { mv = BasicAllowableCapitalGains.mv };
+            }
+        }
+        public LeafNode HigherTaxableCapitalGains {
+            get
+            {
+                if (TaxableCapitalGains.mvs < HigherAllowableCapitalGains)
+                    //it gets more complicated
+                    //pay 28% on any amount above this...
+                    return new LeafNode("HigherTaxableCapitalGains")
+                    { mv = TaxableCapitalGains.mvs - BasicTaxableCapitalGains.mv };
+                else
+                    return new LeafNode("HigherTaxableCapitalGains")
+                    { mv = 0 };
+            }
+        }
         public float capitalGainsAllowance = 11000;
-        public LeafNode allowableCapitalGains;
+        public LeafNode BasicAllowableCapitalGains
+        {
+            get
+            {
+                return new LeafNode("basicAllowableCapitalGains")
+                { mv = (32010 - 12000) / Option.Intervals };
+                //HAVE to divide by intervals, because this is split, over ALL these intervals.
+                //(only sell ONCE).
+                //32010 is the cut off point (yearly) for basic allowable CG.
+                //12000 is, say my oldAge income, when I sell the house...
+            }
+        }
+        public float HigherAllowableCapitalGains
+        {
+            get
+            {
+                return (150000 - 12000) / Option.Intervals;
+                //??? guess..
+            }
+        }
         //public LeafNode incomeAndTaxableCG;
-        public LeafNode capitalGainsTax;
-        public LeafNode capitalGainsProfit;
+        public LeafNode CapitalGainsTax
+        {
+            get
+            {
+                if (buyType == BuyType.toLiveIn)
+                    return new LeafNode("CapitalGainsTax")
+                    {
+                        mvs =
+                        BasicTaxableCapitalGains.mv * 0.18f
+                        + HigherTaxableCapitalGains.mv * 0.28f,
+                        mv = 
+                        (PropertyCount - 1) *
+                        BasicTaxableCapitalGains.mv * 0.18f
+                        + HigherTaxableCapitalGains.mv * 0.28f,
+                    };
+                else
+                    return new LeafNode("CapitalGainsTax")
+                    {
+                        mvs =
+                        BasicTaxableCapitalGains.mv * 0.18f
+                        + HigherTaxableCapitalGains.mv * 0.28f,
+                        mv =
+                        PropertyCount *
+                        BasicTaxableCapitalGains.mv * 0.18f
+                        + HigherTaxableCapitalGains.mv * 0.28f,
+                    };
+                //WHATTTT!!! BUT I made 30,000 in capitalGains...
+                //AND allowable capGains is 20,000.
+                //SO SURELY SOME of my taxableCapGains falls in to the HIGHER bracket???
+                //AHHH but allowable CapGains is £11,000, SO allowable capGains is 20,000 + 11,000 = £31,000,
+                //SO I am JUST ABOUT OK!!! only pay 18% on most of my capGains...    
+            }
+        }
+        public LeafNode CapitalGainsProfit
+        {
+            get
+            {
+                return new LeafNode("capitalGainsProfit")
+                { mv = CapitalGains.mv - CapitalGainsTax.mv };
+            }
+        }
         public LeafNode RentSavings
         {
             get
@@ -169,7 +303,20 @@ namespace InvestmentOptions {
                     { mv = 0 };
             }
         }
-        public float percentageGrowth;
+        public float PercentageGrowth
+        {
+            get
+            {
+                switch (location)
+                {
+                    case Location.Nottingham:
+                        return 0.035f / 12;
+                    case Location.London:
+                        return 0.045f / 12;
+                }
+                return 0.035f / 12;
+            }
+        }
 
         public Property(InvestmentOption option) : base("property") {
             Option = option;
@@ -184,125 +331,63 @@ namespace InvestmentOptions {
             Nodes.Add(TaxableTenantsRent);
             TaxableTenantsRent.ShowInChartList[1] = true;
             Nodes.Add(Outgoings);
-            Nodes.Add(costs = new LeafNode("costs"));
-            costs.ShowInChartList[1] = true;
+            Nodes.Add(Costs);
+            Costs.ShowInChartList[1] = true;
             Nodes.Add(WearAndTear);
             WearAndTear.ShowInChartList[2] = true;
             Nodes.Add(AgentsFee);
             AgentsFee.ShowInChartList[2] = true;
             Nodes.Add(AccountantsFee);
             AccountantsFee.ShowInChartList[2] = true;
-            Nodes.Add(profitAndSavings = new LeafNode("profitAndSavings"));
+            Nodes.Add(profitAndSavings);
             profitAndSavings.ShowInChartList[1] = true;
             Nodes.Add(TaxableProfit);
             TaxableProfit.ShowInChartList[1] = true;
             Nodes.Add(IncomeTax); 
             IncomeTax.ShowInChartList[1] = true;
-            Nodes.Add(returnOnInvestment = new LeafNode("returnOnInvestment"));
-            returnOnInvestment.ShowInChartList[3] = true;
-            Nodes.Add(capitalGains = new LeafNode("capitalGains"));
-            capitalGains.ShowInChartList[0] = true; 
-            Nodes.Add(taxableCapitalGains = new LeafNode("taxableCapitalGains"));
-            taxableCapitalGains.ShowInChartList[1] = true;
-            Nodes.Add(taxableCapitalGainsBasic = new LeafNode("taxableCapitalGainsBasic"));
-            taxableCapitalGainsBasic.ShowInChartList[0] = true;
-            taxableCapitalGainsBasic.ShowInChartList[1] = true;
-            Nodes.Add(taxableCapitalGainsHigher = new LeafNode("taxableCapitalGainsHigher"));
-            taxableCapitalGainsHigher.ShowInChartList[0] = true;
-            taxableCapitalGainsHigher.ShowInChartList[1] = true;
-            Nodes.Add(allowableCapitalGains = new LeafNode("allowableCapitalGains"));
-            Nodes.Add(capitalGainsTax = new LeafNode("capitalGainsTax"));
-            Nodes.Add(capitalGainsProfit = new LeafNode("capitalGainsProfit"));
-            capitalGainsProfit.ShowInChartList[0] = true;
+            Nodes.Add(ReturnOnInvestment);
+            ReturnOnInvestment.ShowInChartList[3] = true;
+            Nodes.Add(CapitalGains);
+            CapitalGains.ShowInChartList[0] = true; 
+            Nodes.Add(TaxableCapitalGains);
+            TaxableCapitalGains.ShowInChartList[1] = true;
+            Nodes.Add(BasicTaxableCapitalGains);
+            BasicTaxableCapitalGains.ShowInChartList[0] = true;
+            BasicTaxableCapitalGains.ShowInChartList[1] = true;
+            Nodes.Add(HigherTaxableCapitalGains);
+            HigherTaxableCapitalGains.ShowInChartList[0] = true;
+            HigherTaxableCapitalGains.ShowInChartList[1] = true;
+            Nodes.Add(CapitalGainsTax);
+            Nodes.Add(CapitalGainsProfit);
+            CapitalGainsProfit.ShowInChartList[0] = true;
             Nodes.Add(RentSavings);
         }
 
         public void BuyNewProperty() {
             PropertyCount++;
-            TenantCount.mv += BedroomsPerHouse;
-        }
-
-        public void CalculateCapitalGainsProfit() {
-            allowableCapitalGains.basic = (32010 - 12000) / Option.Intervals;
-            //HAVE to divide by intervals, because this is split, over ALL these intervals... (only sell ONCE).
-            //12000 is, say my oldAge income, when I sell the house...
-            allowableCapitalGains.higher = (150000 - 12000) / Option.Intervals; //??? guess..
-            switch (location) {
-                case Location.Nottingham:
-                    percentageGrowth = 0.035f / 12;
-                    break;
-                case Location.London:
-                    percentageGrowth = 0.045f / 12;
-                    break;
-            }
-            //WHATTTT!!! BUT I made 30,000 in capitalGains...
-            //AND allowable capGains is 20,000.
-            //SO SURELY SOME of my taxableCapGains falls in to the HIGHER bracket???
-            //AHHH but allowable CapGains is £11,000, SO allowable capGains is 20,000 + 11,000 = £31,000,
-            //SO I am JUST ABOUT OK!!! only pay 18% on most of my capGains...
-            capitalGains.mvs = housePrice * percentageGrowth;
-            capitalGains.mv = PropertyCount * capitalGains.mvs;
-            capitalGains.cumulativeValue += capitalGains.mv;
-            taxableCapitalGains.mvs = capitalGains.mvs - capitalGainsAllowance / Option.Intervals;
-            taxableCapitalGains.mv = PropertyCount * taxableCapitalGains.mvs;
-            //NOW remember, selling one house each year!!! THATS WHY got the mvs below...
-            if (taxableCapitalGains.mvs < allowableCapitalGains.basic) { //Split it up...
-                taxableCapitalGainsBasic.mv = taxableCapitalGains.mvs;
-            }
-            else if (taxableCapitalGains.mvs < allowableCapitalGains.higher) { //it gets more complicated
-                //pay 28% on any amount above this...
-                taxableCapitalGainsBasic.mv = allowableCapitalGains.basic;
-                taxableCapitalGainsHigher.mv = taxableCapitalGains.mvs - taxableCapitalGainsBasic.mv;
-            }
-            capitalGainsTax.mvs = taxableCapitalGainsBasic.mv * 0.18f
-                                + taxableCapitalGainsHigher.mv * 0.28f;
-            capitalGainsTax.mv = PropertyCount * capitalGainsTax.mvs;
-            if (buyType == BuyType.toLiveIn)
-                capitalGainsTax.mv = (PropertyCount - 1) * capitalGainsTax.mvs;
-            capitalGainsProfit.mv = capitalGains.mv - capitalGainsTax.mv;
-            capitalGainsProfit.cumulativeValue += capitalGainsProfit.mv;
-            taxableCapitalGainsBasic.cumulativeValue += taxableCapitalGainsBasic.mv;
-            taxableCapitalGainsHigher.cumulativeValue += taxableCapitalGainsHigher.mv;
-        }
-
-        public void CalculatePropertyIncomeTax() {
-            
-            profitAndSavings.mv = TaxableProfit.mv - IncomeTax.mv + RentSavings.mv;
-            if (Option.zeroInvestment) {
-                profitAndSavings.mv = 
-                    Option.Mortgage.repayment.cumulativeValue * Option.Mortgage.interestRate; 
-            }
         }
 
         public void ResetCumulativeValues() {
-            capitalGains.cumulativeValue = 0;
-            capitalGainsProfit.cumulativeValue = 0;
-            taxableCapitalGainsBasic.cumulativeValue = 0;
-            taxableCapitalGainsHigher.cumulativeValue = 0;
+            CapitalGains.cumulativeValue = 0;
+            CapitalGainsProfit.cumulativeValue = 0;
+            BasicTaxableCapitalGains.cumulativeValue = 0;
+            HigherTaxableCapitalGains.cumulativeValue = 0;
         }
 
         public void ResetIndependentVariables() {
             PropertyCount = OriginalPropertyCount; 
-            //Independent, but changes after certain events. Needs a setter.
-            //If dependent, all logic done in getter. No setter required.
-            //If no change at all, but independent, then again no setter required. 
             housePrice = OriginalHousePrice;
             ResetCumulativeValues();
-            //Could call this with an event, OR just call it in upper method...
-            //Note, event might be easier, because just define the reaction in BASE class,
-            //then every object created, will update itself automatically!!! //CBTL
         }
 
-        public void UpdateVariables() {
-            CalculatePropertyIncomeTax();
-            costs.mv = Outgoings.mv - Option.Mortgage.repayment.mv;
-            if (Option.zeroInvestment) {
-                costs.mv = 0;
-            }
+        public void UpdateIndependentVariables() {
             moneyInvested += Option.Mortgage.repayment.mv;
-            returnOnInvestment.mv = 12 * profitAndSavings.mv / moneyInvested * 100;
-            CalculateCapitalGainsProfit();
-            housePrice = housePrice * (1 + percentageGrowth);
+            housePrice = housePrice * (1 + PercentageGrowth);
+            //cumValues
+            CapitalGains.cumulativeValue += CapitalGains.mv;
+            CapitalGainsProfit.cumulativeValue += CapitalGainsProfit.mv;
+            BasicTaxableCapitalGains.cumulativeValue += BasicTaxableCapitalGains.mv;
+            HigherTaxableCapitalGains.cumulativeValue += HigherTaxableCapitalGains.mv;
         }
 
     }

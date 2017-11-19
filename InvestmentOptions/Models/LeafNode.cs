@@ -15,8 +15,6 @@ namespace InvestmentOptions {
         public List<bool> ShowInChartList { get; set; } = new List<bool>();
         public float mv; //monthyValue
         public float mvs; //mv for a single property...
-        public float basic;
-        public float higher;
         public float additional;
         public float cumulativeValue;
         public Series monthlySeries;

@@ -135,7 +135,7 @@ namespace InvestmentOptions {
             Property.Ingoings.cumulativeValue += Property.Ingoings.mv;
             Outgoings.cumulativeValue += Outgoings.mv;
             //Shelter.outgoings.cumulativeValue += Shelter.houseCosts.mv;
-            Life.outgoings.cumulativeValue += Life.costs.mv;
+            Life.outgoings.cumulativeValue += Life.Costs.mv;
             Property.Outgoings.cumulativeValue += Property.Outgoings.mv;
             Mortgage.repayment.cumulativeValue += Mortgage.repayment.mv;
             Mortgage.interest.cumulativeValue += Mortgage.interest.mv;
@@ -166,7 +166,7 @@ namespace InvestmentOptions {
 
         public void CalculateOutgoings() {
             Shelter.houseCosts.mv = Shelter.rent.mv + Shelter.houseBills.mv + Shelter.councilTax.mv;
-            Outgoings.mv = Shelter.houseCosts.mv + Life.costs.mv + Property.Outgoings.mv;
+            Outgoings.mv = Shelter.houseCosts.mv + Life.Costs.mv + Property.Outgoings.mv;
         }
 
         //public void initialiseKeyList() {
@@ -206,12 +206,12 @@ namespace InvestmentOptions {
             for (int interval = 0; interval < Intervals; interval++) {
                 //Calculations:
                 Mortgage.CalculateMortgagePayments(Intervals);
-                Property.UpdateVariables();
+                Property.UpdateIndependentVariables();
                 CalculateIngoings();
                 CalculateOutgoings();
                 BankAccount.mv += Ingoings.mv - Outgoings.mv;
                 NetWorth.mv += Ingoings.mv - Outgoings.mv +
-                    Mortgage.repayment.mv + Property.capitalGainsProfit.mv;
+                    Mortgage.repayment.mv + Property.CapitalGainsProfit.mv;
                 //STORE TOTALS
                 CalculateCumulativeValues();
                 //UPDATE SERIES RECURSIVELY

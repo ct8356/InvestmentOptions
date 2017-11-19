@@ -8,10 +8,14 @@ namespace InvestmentOptions {
     public class Life : BranchNode {
 
         public LeafNode outgoings;
+        //NOTE outgoings are bankAccount outgoings,
+        //Costs are outgoings - moneyInvested in other things!
         LeafNode _costs;
-        public LeafNode costs {
+        public LeafNode Costs {
             get {
-                _costs.mv = phoneBill + food + randomObjects + danceLessons + randomEventsAndServices
+                _costs.mv = 
+                    phoneBill + food + randomObjects + 
+                    danceLessons + randomEventsAndServices
                     + charity;
                 return _costs;
             }
@@ -34,14 +38,9 @@ namespace InvestmentOptions {
 
         public Life(InvestmentOption option) : base("life") {
             Nodes.Add(outgoings = new LeafNode("lifeOutgoings"));
-            Nodes.Add(costs = new LeafNode("lifecosts"));
+            Nodes.Add(Costs = new LeafNode("lifecosts"));
             this.Option = option;
         }
 
-        //public float sum {
-        //    get {
-        //        return phoneBill + food + randomObjects + danceLessons + randomEventsAndServices + charity;
-        //    }
-        //}
     }
 }

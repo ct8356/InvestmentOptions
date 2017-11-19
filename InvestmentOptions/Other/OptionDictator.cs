@@ -73,7 +73,7 @@ namespace InvestmentOptions {
             garages.Mortgage.type = Mortgage.BuyType.interestOnly;
             garages.Property.buyType = Property.BuyType.toLet;
             garages.Property.OriginalHousePrice = 20000;
-            garages.Property.OriginalPropertyCount = 2;
+            garages.Property.OriginalPropertyCount = 0;
             Options.Add(garages);
         }
 
