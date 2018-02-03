@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\BranchNode.cs" />
+    <Compile Include="Other\PropertyBuilder.cs" />
     <Compile Include="Views\ControlPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -121,6 +122,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cjt.Interfaces\Cjt.Interfaces.csproj">
+      <Project>{cee6c0c6-c349-4200-85a0-e88fe61efc63}</Project>
+      <Name>Cjt.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

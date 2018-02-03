@@ -4,19 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using Cjt.Interfaces;
 
 namespace InvestmentOptions {
 
-    public class LeafNode : TreeNode {
+    public class LeafNode : TreeNode, IMoney {
         //later, if decide treeNode is too heavyWeight, to have loads of,
         // just modify this class, to make it more lightWeight...
         //NOTE: Could make this a generic class, to hold floats, and bools...
         public bool boolean;
         public List<bool> ShowInChartList { get; set; } = new List<bool>();
-        public float mv; //monthyValue
+        public float mv { get; set; } //monthyValue
         public float mvs; //mv for a single property...
         public float additional;
-        public float cumulativeValue;
+        public float cumulativeValue { get; set; }
         public Series monthlySeries;
         public Series cumulativeSeries;
 

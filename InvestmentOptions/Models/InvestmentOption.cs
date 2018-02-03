@@ -20,6 +20,7 @@ namespace InvestmentOptions {
         public Job Job { get; set; }
         public Life Life { get; set; }
         public Mortgage Mortgage { get; set; }
+        public PropertyBuilder PropertyBuilder { get; set; }
         public Property Property { get; set; }
         public Shelter Shelter { get; set; }
         //OTHER NODES (WITH SERIES)
@@ -72,6 +73,7 @@ namespace InvestmentOptions {
             //OR bind the tree to these variables, OR any of above, just try one, then will see strngths and wknss.
             //initialiseTree(); //BIZARRELY! if call this, won't show up in other tree!
             //addChildren();
+            PropertyBuilder = new PropertyBuilder(this);
         }
 
         public InvestmentOption(string name, ProjectionForm form) : this(name) {
@@ -84,8 +86,8 @@ namespace InvestmentOptions {
             Nodes.Add(Life = new Life(this));
             Nodes.Add(Shelter = new Shelter(this));
             Nodes.Add(Job = new Job(this));         
+            Nodes.Add(Property = PropertyBuilder.Build());
             Nodes.Add(Mortgage = new Mortgage(this));
-            Nodes.Add(Property = new Property(this));
             //Shelter.rent.showInChartList[1] = true;
             Nodes.Add(BankAccount = new LeafNode("bankAccount"));
             BankAccount.ShowInChartList[0] = true;
@@ -116,12 +118,20 @@ namespace InvestmentOptions {
         //}
 
         public void Invest() {
-            if (BankAccount.mv > Mortgage.deposit) {
+            if (BankAccount.mv >= Mortgage.SingleDeposit)
+            {
                 //invest
-                Mortgage.moneyBorrowed += Property.price - Mortgage.deposit; // not that important.
-                Mortgage.moneyOwed += Property.housePrice - Mortgage.deposit;
-                BankAccount.mv -= Mortgage.deposit;
-                Property.moneyInvested += Mortgage.deposit;
+                if (Property.OriginalHousePrice >= Mortgage.SingleDeposit) {
+                    Mortgage.moneyBorrowed += Property.OriginalHousePrice - Mortgage.SingleDeposit;
+                    // not that important.
+                    Mortgage.moneyOwed.mv += Property.OriginalHousePrice - Mortgage.SingleDeposit;
+                }
+                else
+                {
+                    //No need to borrow/owe any more money.
+                }
+                BankAccount.mv -= Mortgage.SingleDeposit;
+                Property.moneyInvested += Mortgage.SingleDeposit;
                 //Benefits
                 Property.BuyNewProperty();
             } //something you forgetting to update. what is it? YES the extra features that make you money!
@@ -244,7 +254,7 @@ namespace InvestmentOptions {
             //Option specific stuff
             BankAccount.mv = 0;
             BankAccount.cumulativeValue = 0;
-            NetWorth.mv = BankAccount.mv + Property.PropertyCount * Mortgage.deposit;
+            NetWorth.mv = BankAccount.mv + Property.PropertyCount * Mortgage.SingleDeposit;
             NetWorth.cumulativeValue = NetWorth.mv;
         }
 

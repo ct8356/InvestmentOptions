@@ -16,39 +16,50 @@ namespace InvestmentOptions {
         }
 
         public void CreateOptions(ProjectionForm Form) {
-            InvestmentOption interestOnlyMortgage = new InvestmentOption("interestOnlyMortgage", Form);
-            interestOnlyMortgage.Mortgage.type = Mortgage.BuyType.interestOnly;
-            interestOnlyMortgage.Property.buyType = Property.BuyType.toLet;
-            Options.Add(interestOnlyMortgage);
+            InvestmentOption interestOnlyLet = new InvestmentOption("interestOnlyLet", Form);
+            interestOnlyLet.Mortgage.type = Mortgage.BuyType.interestOnly;
+            interestOnlyLet.Property.buyType = Property.BuyType.toLet;
+            Options.Add(interestOnlyLet);
             //Should just make a constructor that does this stuff!
-            //saves writing...
+            //saves writing.
+
+            InvestmentOption garages = new InvestmentOption("garages", Form);
+            garages.Mortgage.type = Mortgage.BuyType.interestOnly;
+            garages.Mortgage.SingleDeposit = 5000;
+            garages.Property.buyType = Property.BuyType.toLet;
+            garages.Property.OriginalPropertyCount = 5;
+            garages.Property.OriginalHousePrice = 20000;
+            garages.Property.BedroomsPerHouse = 1;
+            garages.Property.SingleTenantsRent = 80;
+
+            Options.Add(garages);
 
             InvestmentOption interestOnlyLiveIn = new InvestmentOption("interestOnlyLiveIn", Form);
             interestOnlyLiveIn.Mortgage.type = Mortgage.BuyType.interestOnly;
             interestOnlyLiveIn.Property.buyType = Property.BuyType.toLiveIn;
             Options.Add(interestOnlyLiveIn);
 
-            InvestmentOption repaymentMortgage = new InvestmentOption("repaymentMortgage", Form);
-            repaymentMortgage.Mortgage.type = Mortgage.BuyType.repayment;
-            repaymentMortgage.Property.buyType = Property.BuyType.toLet;
-            Options.Add(repaymentMortgage);
+            InvestmentOption repaymentLet = new InvestmentOption("repaymentLet", Form);
+            repaymentLet.Mortgage.type = Mortgage.BuyType.repayment;
+            repaymentLet.Property.buyType = Property.BuyType.toLet;
+            Options.Add(repaymentLet);
 
-            InvestmentOption buyToLiveMortgage = new InvestmentOption("buyToLiveMortgage", Form);
-            buyToLiveMortgage.Mortgage.type = Mortgage.BuyType.repayment;
-            buyToLiveMortgage.Property.buyType = Property.BuyType.toLiveIn;
-            Options.Add(buyToLiveMortgage);
+            InvestmentOption repaymentLive = new InvestmentOption("repaymentLive", Form);
+            repaymentLive.Mortgage.type = Mortgage.BuyType.repayment;
+            repaymentLive.Property.buyType = Property.BuyType.toLiveIn;
+            Options.Add(repaymentLive);
 
-            InvestmentOption interestOnlyLondon = new InvestmentOption("interestOnlyLondon", Form);
-            interestOnlyLondon.Mortgage.type = Mortgage.BuyType.interestOnly;
-            interestOnlyLondon.Property.buyType = Property.BuyType.toLet;
-            interestOnlyLondon.Property.location = Property.Location.London;
-            Options.Add(interestOnlyLondon);
+            InvestmentOption interestOnlyLetLondon = new InvestmentOption("interestOnlyLetLondon", Form);
+            interestOnlyLetLondon.Mortgage.type = Mortgage.BuyType.interestOnly;
+            interestOnlyLetLondon.Property.buyType = Property.BuyType.toLet;
+            interestOnlyLetLondon.Property.location = Property.Location.London;
+            Options.Add(interestOnlyLetLondon);
 
-            InvestmentOption threeBedLiveIn = new InvestmentOption("threeBedLiveIn", Form);
-            threeBedLiveIn.Mortgage.type = Mortgage.BuyType.repayment;
-            threeBedLiveIn.Property.buyType = Property.BuyType.toLiveIn;
-            threeBedLiveIn.Property.housePrice = 125000;
-            Options.Add(threeBedLiveIn);
+            InvestmentOption repaymentLive3Bed = new InvestmentOption("repaymentLive3Bed", Form);
+            repaymentLive3Bed.Mortgage.type = Mortgage.BuyType.repayment;
+            repaymentLive3Bed.Property.buyType = Property.BuyType.toLiveIn;
+            repaymentLive3Bed.Property.OriginalHousePrice = 125000;
+            Options.Add(repaymentLive3Bed);
 
             InvestmentOption zeroInvestment = new InvestmentOption("zeroInvestment", Form);
             zeroInvestment.Mortgage.type = Mortgage.BuyType.repayment;
@@ -69,12 +80,6 @@ namespace InvestmentOptions {
             hundredGrand4houses.Property.OriginalPropertyCount = 4;
             Options.Add(hundredGrand4houses);
 
-            InvestmentOption garages = new InvestmentOption("garages", Form);
-            garages.Mortgage.type = Mortgage.BuyType.interestOnly;
-            garages.Property.buyType = Property.BuyType.toLet;
-            garages.Property.OriginalHousePrice = 20000;
-            garages.Property.OriginalPropertyCount = 0;
-            Options.Add(garages);
         }
 
     }

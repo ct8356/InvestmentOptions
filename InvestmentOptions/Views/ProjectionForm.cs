@@ -38,10 +38,11 @@ namespace InvestmentOptions {
             //OPTIONS DATA
             OptionsList = optionsList;
             //GRAPH PANELS
-            AddProjectionPanels(); //have to do before optionsList for some reason...
+            AddProjectionPanels(); //have to do before controlPanel.Add(optionList) for some reason.
             //OPTIONS LIST PANEL
             controlPanel.ListBox.Items.AddRange(OptionsList.ToArray());
             controlPanel.ListBox.SetItemChecked(0, true);
+            controlPanel.ListBox.SetItemChecked(1, true);
             //GLOBAL PARAMS PANEL
             controlPanel.globalParameters.addCheckBoxes();
             Property.includeWearAndTear.Value = true;
